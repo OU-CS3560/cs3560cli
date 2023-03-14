@@ -1,4 +1,5 @@
-# scripts
+# cs3560cli
+
 A set of internal tooling, open-sourced.
 
 ## Installation
@@ -13,7 +14,17 @@ python -m pip install cs3560cli
 python -m cs3560cli --help
 ```
 
-## Build
+## Features
+
+### check-username
+
+### watch-zip
+
+### (TODO) create-gitignore
+
+## Maintaining
+
+### Build
 
 Build time dependencies
 
@@ -27,15 +38,15 @@ To build
 python -m build
 ```
 
-## Upload
+### Upload
 
-### Upload to test PyPI
+#### Upload to test PyPI
 
 ```console
 twine upload -r testpypi dist/*
 ```
 
-### Upload to real PyPI
+#### Upload to real PyPI
 
 ```console
 twine upload dist/*
