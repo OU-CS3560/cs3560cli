@@ -1,0 +1,18 @@
+[project]
+name = "cs3560cli"
+version = "0.1.0"
+dependencies = [
+    "click",
+    "Pygments",
+    "rich",
+    "ruamel.yaml",
+    "tqdm",
+    'importlib-metadata; python_version>"3.8"',
+]
+
+[build-system]
+requires = ["setuptools"]
+build-backend = "setuptools.build_meta"
+
+[project.scripts]
+cs3560cli = "ou_cs3560_scripts.main:cli"
