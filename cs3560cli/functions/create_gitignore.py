@@ -73,8 +73,7 @@ def get_content(names: list[str], bases: list[str]=["windows", "macos"],
             res = requests.get(root + path)
             if res.status_code == 200:
                 header_text = header_text_template.format(path=path)
-                final_text += header_text + "\n"
-                final_text += f"# - {path}\n"
+                final_text += header_text
                 final_text += res.text + "\n"
             else:
                 raise ApiError(f"status code from API is not as expected. Expect 200 but get {res.status_code}")
