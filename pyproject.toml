@@ -1,6 +1,6 @@
 [project]
 name = "cs3560cli"
-version = "0.1.1"
+version = "0.1.2"
 dependencies = [
     "click",
     "Pygments",
@@ -16,4 +16,4 @@ requires = ["setuptools"]
 build-backend = "setuptools.build_meta"
 
 [project.scripts]
-cs3560cli = "ou_cs3560_scripts.main:cli"
+cs3560cli = "cs3560cli.main:cli"
