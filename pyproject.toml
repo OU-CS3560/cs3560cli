@@ -1,12 +1,13 @@
 [project]
 name = "cs3560cli"
-version = "0.1.0"
+version = "0.1.1"
 dependencies = [
     "click",
     "Pygments",
     "rich",
     "ruamel.yaml",
     "tqdm",
+    "watchdog",
     'importlib-metadata; python_version>"3.8"',
 ]
 
