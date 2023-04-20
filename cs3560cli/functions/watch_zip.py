@@ -38,17 +38,18 @@ def is_7z_available() -> bool:
 
 
 def extract(path: Path):
-    dir_path = Path(path.stem)
+    dir_name = path.stem
+    dir_path = path.with_name(dir_name)
 
     if dir_path.exists() and dir_path.is_dir():
-        print("[warn] target folder already exist, skipping the extraction")
+        print(f"[warn] target folder ({str(dir_path)}) already exist, skipping the extraction")
         return
 
     if platform.is_linux():
         # FIXME: The 7z will flatten the directory tree.
-        subprocess.check_output(args=["7z", "e", path, f"-o{path.stem}"])
+        subprocess.check_output(args=["7z", "x", path, f"-o{str(dir_path)}"])
     elif platform.is_windows():
-        subprocess.check_output(args=[str(WIN_KNOWN_7Z_PATH), "e", path, f"-o{path.stem}"])
+        subprocess.check_output(args=[str(WIN_KNOWN_7Z_PATH), "x", path, f"-o{str(dir_path)}"])
 
 class ArchiveFilesEvenHandler(PatternMatchingEventHandler):
     def __init__(self):
