@@ -70,8 +70,8 @@ def highlight(ctx, in_file: str | Path="-", out_file: str | Path="-", lexer: str
                     click.echo(f"'{str(outfile_path)}' is not modified")
                     ctx.exit()
 
-            with open(outfile_path, "w") as in_f:
-                outfile_path.write(result)
+            with open(outfile_path, "w") as out_f:
+                out_f.write(result)
 
 
 if __name__ == "__main__":
