@@ -1,6 +1,6 @@
 # cs3560cli
 
-A set of internal tooling, open-sourced.
+A set of internal tools for [Ohio University](https://www.ohio.edu/)'s CS3560 course, open-sourced.
 
 ## Installation
 
@@ -16,44 +16,32 @@ python -m cs3560cli --help
 
 ## Features
 
-### check-username
-
-### highlight
-
-Create a syntax highlight code block with in-line style. The result can thus be embed into content of LMS.
-
 ### watch-zip
 
 Watch for an archive file and extract it.
 
-### (TODO) create-gitignore
-
-## Maintaining
-
-### Build
-
-Build time dependencies
+Usage
 
 ```console
-python -m pip install --upgrade build twine
+$ python -m cs3560cli watch-zip .
+$ python -m cs3560cli watch-zip ~/Downloads
 ```
 
-To build
+### highlight
+
+Create a syntax highlight code block with in-line style. The result can thus be embed into a content of LMS.
+
+### create-gitignore
+
+Create a `.gitignore` file using content from [github/gitignore repository](https://github.com/github/gitignore).
+
+Usage
 
 ```console
-python -m build
+$ python -m cs3560cli create-gitignore python
+$ python -m cs3560cli create-gitignore cpp
 ```
 
-### Upload
+By default, it also add `windows` and `macos` to the `.gitignore` file.
 
-#### Upload to test PyPI
-
-```console
-twine upload -r testpypi dist/*
-```
-
-#### Upload to real PyPI
-
-```console
-twine upload dist/*
-```
+### check-username

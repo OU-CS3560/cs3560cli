@@ -1,5 +1,9 @@
 # Changelog
 
+## v0.1.4
+
+- Revise project metadata. No change to the codebase.
+
 ## v0.1.3
 
 - Fix bug in the highlight command.
