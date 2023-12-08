@@ -1,5 +1,9 @@
 # Changelog
 
+## v0.1.3
+
+- Fix bug in the highlight command.
+
 ## v0.1.2
 
 - Adding `highlight` command

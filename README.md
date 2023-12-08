@@ -18,7 +18,13 @@ python -m cs3560cli --help
 
 ### check-username
 
+### highlight
+
+Create a syntax highlight code block with in-line style. The result can thus be embed into content of LMS.
+
 ### watch-zip
+
+Watch for an archive file and extract it.
 
 ### (TODO) create-gitignore
 
