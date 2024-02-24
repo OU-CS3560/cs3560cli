@@ -1,5 +1,9 @@
 # Changelog
 
+## Unreleased
+
+- BREAKING CHANGE: Rename `cs3560cli.functions` to `cs3560cli.commands`.
+
 ## v0.1.4
 
 - Revise project metadata. No change to the codebase.
