@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+## v0.2.0
+
+See changes from v0.2.0a1 to v0.2.0rc1.
+
 ## v0.2.0rc1
 
 - Finalize the format of the TSV data `blackboard student-list` outputs.
