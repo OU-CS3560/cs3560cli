@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- Add `blackboard categorize` command from `krerkkiat/ta-tooling`.
+
 ## v0.2.0
 
 See changes from v0.2.0a1 to v0.2.0rc1.

@@ -13,7 +13,7 @@ import click
 from flask import Flask, render_template, request
 from flask_cors import CORS
 
-from cs3560cli.blackboard import filter_by_role, parse_url_for_course_id
+from cs3560cli.blackboard import categorize, filter_by_role, parse_url_for_course_id
 
 template_dir_path = Path(__file__).parent.parent / "templates"
 static_dir_path = Path(__file__).parent.parent / "static"
@@ -118,6 +118,7 @@ def blackboard():
 @blackboard.command(name="student-list")
 @click.argument("course_url", nargs=1, required=False)
 def student_list_command(course_url):
+    """Obtain a list of student form Blackboard's API."""
     if course_url is None:
         """Show/open web UI."""
         app = create_app()
@@ -184,3 +185,24 @@ def student_list_command(course_url):
                 course_membership_id=entry["id"],
             )
             print(row)
+
+
+@blackboard.command(name="categorize")
+@click.argument(
+    "source",
+    type=click.Path(
+        exists=True, file_okay=True, dir_okay=True, readable=True, writable=True
+    ),
+    required=True,
+)
+@click.argument(
+    "destination",
+    type=click.Path(
+        exists=False, file_okay=False, dir_okay=True, readable=True, writable=True
+    ),
+    required=True,
+)
+def categorize_command(source, destination):
+    """Group files from the same student together in a folder."""
+    click.echo("Categorizing files ...")
+    categorize(source, destination)
