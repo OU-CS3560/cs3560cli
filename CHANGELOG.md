@@ -3,6 +3,7 @@
 ## Unreleased
 
 - BREAKING CHANGE: Rename `cs3560cli.functions` to `cs3560cli.commands`.
+- Centralize version number location.
 
 ## v0.1.4
 

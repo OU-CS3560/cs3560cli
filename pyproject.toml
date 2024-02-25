@@ -1,19 +1,29 @@
+[build-system]
+requires = ["setuptools"]
+build-backend = "setuptools.build_meta"
+
 [project]
 name = "cs3560cli"
-version = "0.1.4a2"
 description = "A set of internal tools for Ohio University's CS3560 course"
 readme = "README.md"
 license = {file = "LICENSE"}
+dynamic = ["version"]
+requires-python = ">=3.8"
 dependencies = [
+    'importlib-metadata; python_version>="3.8"',
     "click",
     "Pygments",
     "rich",
     "ruamel.yaml",
     "tqdm",
     "watchdog",
-    'importlib-metadata; python_version>"3.8"',
     "requests",
+    "flask",
+    "flask-cors",
 ]
+
+[project.optional-dependencies]
+dev = ["pytest", "pytest-cov"]
 
 [project.urls]
 Homepage = "https://github.com/OU-CS3560/cs3560cli"
@@ -21,9 +31,19 @@ Repository = "https://github.com/OU-CS3560/cs3560cli.git"
 Issues = "https://github.com/OU-CS3560/cs3560cli/issues"
 Changelog = "https://github.com/OU-CS3560/cs3560cli/blob/main/CHANGELOG.md"
 
-[build-system]
-requires = ["setuptools"]
-build-backend = "setuptools.build_meta"
-
 [project.scripts]
 cs3560cli = "cs3560cli.main:cli"
+
+[tool.setuptools]
+packages = ["cs3560cli", "cs3560cli.commands"]
+
+[tool.setuptools.dynamic]
+version = { file = "cs3560cli/VERSION" }
+
+[tool.isort]
+profile = "black"
+
+[tool.pytest.ini_options]
+markers = [
+    "interest: marks tests as interested (deselect with '-m \"not interest\"')",
+]
