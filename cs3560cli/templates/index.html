@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>cs3560cli - blackboard - student-list</title>
+    <link href="https://cdn.jsdelivr.net/npm/daisyui@4.7.2/dist/full.min.css" rel="stylesheet" type="text/css" />
+</head>
+
+<body>
+    <div class="container mx-auto px-4 py-4">
+        <form hx-post="/get-link" hx-target="this" hx-swap="outerHTML">
+            <input name="courseUrl" type="text" placeholder="Course URL" class="input input-bordered w-full max-w-xs" />
+            <button class="btn">Submit</button>
+        </form>
+    </div>
+    <script src="https://unpkg.com/htmx.org@1.9.10"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+</body>
+
+</html>

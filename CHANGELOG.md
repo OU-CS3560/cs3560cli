@@ -5,6 +5,9 @@
 - BREAKING CHANGE: Rename `cs3560cli.functions` to `cs3560cli.commands`.
 - Centralize version number location.
 - Add `cs3560cli.blackboard` with utilities for Blackboard.
+- Add `help` command.
+- Add `blackboard student-list` command.
+- Add the web UI version of the `blackboard student-list` command.
 
 ## v0.1.4
 
