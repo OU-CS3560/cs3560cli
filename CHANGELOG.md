@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## v0.2.0a1
+
 - BREAKING CHANGE: Rename `cs3560cli.functions` to `cs3560cli.commands`.
 - Centralize version number location.
 - Add `cs3560cli.blackboard` with utilities for Blackboard.
