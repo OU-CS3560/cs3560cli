@@ -15,13 +15,15 @@ Specification:
 Dependencies:
 - Pygments
 """
+
 import sys
 from pathlib import Path
 
 import click
 from pygments import highlight as pygments_highlight
-from pygments.lexers import guess_lexer, get_lexer_by_name
 from pygments.formatters import HtmlFormatter
+from pygments.lexers import get_lexer_by_name, guess_lexer
+
 
 def highlight_inline(code: str, lexer):
     formatter = HtmlFormatter()
@@ -35,7 +37,9 @@ def highlight_inline(code: str, lexer):
 @click.option("-o", "--out-file", default="-", type=str)
 @click.option("-l", "--lexer", default="", type=str)
 @click.pass_context
-def highlight(ctx, in_file: str | Path="-", out_file: str | Path="-", lexer: str = ""):
+def highlight(
+    ctx, in_file: str | Path = "-", out_file: str | Path = "-", lexer: str = ""
+):
     """Get syntax highlighted code with inline style"""
     content = ""
     if isinstance(in_file, str):
@@ -76,4 +80,3 @@ def highlight(ctx, in_file: str | Path="-", out_file: str | Path="-", lexer: str
 
 if __name__ == "__main__":
     highlight()
-    

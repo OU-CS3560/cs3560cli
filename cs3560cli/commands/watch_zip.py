@@ -3,19 +3,20 @@ Use pypi/watchdog to watch for and unpack archive file.
 
 For now it is hard coded to use 7z.exe to extract the file.
 """
+
 import os
-import sys
 import subprocess
+import sys
 import time
 from pathlib import Path
 
 import click
-
-from watchdog.observers import Observer
 from watchdog.events import PatternMatchingEventHandler
+from watchdog.observers import Observer
 from watchdog.utils import platform
 
 WIN_KNOWN_7Z_PATH = Path(r"C:\Program Files\7-Zip\7z.exe")
+
 
 def is_7z_available() -> bool:
     """Check if 7z exist."""
@@ -42,23 +43,23 @@ def extract(path: Path):
     dir_path = path.with_name(dir_name)
 
     if dir_path.exists() and dir_path.is_dir():
-        print(f"[warn] target folder ({str(dir_path)}) already exist, skipping the extraction")
+        print(
+            f"[warn] target folder ({str(dir_path)}) already exist, skipping the extraction"
+        )
         return
 
     if platform.is_linux():
         # FIXME: The 7z will flatten the directory tree.
         subprocess.check_output(args=["7z", "x", path, f"-o{str(dir_path)}"])
     elif platform.is_windows():
-        subprocess.check_output(args=[str(WIN_KNOWN_7Z_PATH), "x", path, f"-o{str(dir_path)}"])
+        subprocess.check_output(
+            args=[str(WIN_KNOWN_7Z_PATH), "x", path, f"-o{str(dir_path)}"]
+        )
+
 
 class ArchiveFilesEvenHandler(PatternMatchingEventHandler):
     def __init__(self):
-        super().__init__(patterns=[
-            "*.7z",
-            "*.zip",
-            "*.tar",
-            "*.tar.gz"
-        ])
+        super().__init__(patterns=["*.7z", "*.zip", "*.tar", "*.tar.gz"])
 
     def on_created(self, event):
         if event.is_directory is False:
@@ -108,6 +109,7 @@ def watch_zip(path):
     finally:
         observer.stop()
         observer.join()
+
 
 if __name__ == "__main__":
     watch_zip()

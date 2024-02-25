@@ -7,13 +7,13 @@ Can be used to check if student's username exist on
 This reduce the problem where student submit invalid username.
 Or when the metadata was recorded incorrectly.
 """
-from time import sleep
+
 from pathlib import Path
+from time import sleep
 
 import click
 import requests
 from tqdm import tqdm
-
 
 GITHUB_PROFILE_URL_TEMPLATE = "https://github.com/{username}"
 CODEWARS_PROFILE_URL_TEMPLATE = "https://www.codewars.com/users/{username}"
@@ -30,9 +30,17 @@ def check_url(url_template: str, usernames: list[str]) -> None:
 
         sleep(WAIT_BEFORE_NEXT_REQUEST)
 
+
 @click.command(name="check-username")
 @click.argument("filepath", type=click.Path("r"))
-@click.option("-s", "--site", default="gh", show_default=True, type=click.Choice(("gh", "cw")), help="Which website the username should be checked on (gh for GitHub, cw for Codewars)")
+@click.option(
+    "-s",
+    "--site",
+    default="gh",
+    show_default=True,
+    type=click.Choice(("gh", "cw")),
+    help="Which website the username should be checked on (gh for GitHub, cw for Codewars)",
+)
 def check_username(filepath, site):
     """
     Username Existance Checker.
@@ -48,7 +56,7 @@ def check_username(filepath, site):
     if not isinstance(filepath, Path):
         filepath = Path(filepath)
 
-    if (filepath.exists() and filepath.is_file()):
+    if filepath.exists() and filepath.is_file():
         with open(filepath, "r") as f:
             lines = f.readlines()
             usernames = [line.strip() for line in lines]
@@ -62,7 +70,6 @@ def check_username(filepath, site):
     else:
         print(f"[error]: cannot open file '{str(filepath)}'")
 
-if __name__ == "__main__":
-   check_username()
 
-    
+if __name__ == "__main__":
+    check_username()

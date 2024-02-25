@@ -29,5 +29,7 @@ def filter_by_role(items, role="Student"):
     """Remove non-student item."""
     imtermediate_vals = [item for item in items if item["courseRoleId"] == role]
     return [
-        item for item in imtermediate_vals if not item["user"]["userName"].endswith("_previewuser")
+        item
+        for item in imtermediate_vals
+        if not item["user"]["userName"].endswith("_previewuser")
     ]

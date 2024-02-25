@@ -5,9 +5,10 @@ Instead of adding just the language/platform specific .gitignore
 from https://github.com/github/gitignore, it will also 
 add all OS dependent .gitignore as well.
 """
-from typing import Optional
-from pathlib import Path
+
 import traceback
+from pathlib import Path
+from typing import Optional
 
 import click
 import requests
@@ -30,18 +31,21 @@ aliases = {
     "VisualStudioCode": "vscode",
 }
 
+
 class ApiError(Exception):
     pass
 
+
 def get_path(name: str) -> Optional[str]:
     """Lookup the path.
-    
+
     Assume name is in lowercase and is not an alias.
     """
     if name not in path_mapping.keys():
         return None
-    
+
     return path_mapping[name]
+
 
 def normalize(name: str) -> Optional[str]:
     """Apply alias and lower the case the name."""
@@ -52,11 +56,15 @@ def normalize(name: str) -> Optional[str]:
 
     return name
 
-def get_content(names: list[str], bases: list[str]=["windows", "macos"],
-                root: str="https://raw.githubusercontent.com/github/gitignore/main/",
-                header_text_template: str="#\n# {path}\n# Get the latest version at https://github.com/github/gitignore/{path}\n#\n") -> str:
+
+def get_content(
+    names: list[str],
+    bases: list[str] = ["windows", "macos"],
+    root: str = "https://raw.githubusercontent.com/github/gitignore/main/",
+    header_text_template: str = "#\n# {path}\n# Get the latest version at https://github.com/github/gitignore/{path}\n#\n",
+) -> str:
     """Create .gitignore content from list of names.
-    
+
     Assume that names in bases area already normalized.
     """
     final_text = ""
@@ -64,7 +72,7 @@ def get_content(names: list[str], bases: list[str]=["windows", "macos"],
     names = bases + [normalize(name) for name in names if normalize(name) not in bases]
 
     for name in names:
-        if name is None: 
+        if name is None:
             continue
         path = get_path(name)
         if path is None:
@@ -76,7 +84,9 @@ def get_content(names: list[str], bases: list[str]=["windows", "macos"],
                 final_text += header_text
                 final_text += res.text + "\n"
             else:
-                raise ApiError(f"status code from API is not as expected. Expect 200 but get {res.status_code}")
+                raise ApiError(
+                    f"status code from API is not as expected. Expect 200 but get {res.status_code}"
+                )
         except requests.exceptions.RequestException:
             raise ApiError("error occur when fetching content")
     return final_text
@@ -87,9 +97,14 @@ def get_content(names: list[str], bases: list[str]=["windows", "macos"],
 @click.option("--root", type=click.Path(exists=True), default=".")
 @click.option("--base", type=str, multiple=True, default=["windows", "macos"])
 @click.pass_context
-def create_gitignore(ctx, names: list[str], root: str | Path=".", base: list[str]=["windows", "macos"]) -> str:
+def create_gitignore(
+    ctx,
+    names: list[str],
+    root: str | Path = ".",
+    base: list[str] = ["windows", "macos"],
+) -> str:
     """Create .gitignore content from list of names.
-    
+
     Assume that names in bases area already normalized.
     """
     if isinstance(root, str):

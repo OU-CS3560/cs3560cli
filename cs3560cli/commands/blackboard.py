@@ -22,7 +22,9 @@ STUDENT_LIST_URL = "https://blackboard.ohio.edu/learn/api/public/v1/courses/{cou
 
 def create_app():
     """Create simple flask application for a web UI."""
-    app = Flask(__name__, template_folder=template_dir_path, static_folder=static_dir_path)
+    app = Flask(
+        __name__, template_folder=template_dir_path, static_folder=static_dir_path
+    )
     CORS(app)
 
     @app.route("/", methods=["GET", "POST"])
