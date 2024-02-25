@@ -112,3 +112,14 @@ def student_list_command(course_url):
         data = sys.stdin.read()
         results = json.loads(data)
         students = filter_by_role(results["results"])
+
+        print("CSV data of the students:\n\n")
+        print("emailHandle,firstName,lastName,userId,courseMembershipId")
+        for entry in students:
+            print("{},{},{},{},{}".format(
+                    entry["user"]["userName"],
+                    entry["user"]["name"]["given"],
+                    entry["user"]["name"]["family"],
+                    entry["userId"],  # or user['user']['id']
+                    entry["id"],
+                ))
