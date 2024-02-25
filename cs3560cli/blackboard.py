@@ -7,6 +7,7 @@ from urllib.parse import urlparse
 
 
 def parse_url_for_course_id(url: str) -> Optional[str]:
+    """Parse course URL for ID."""
     u = urlparse(url)
     tokens = u.path.split("/")
 
@@ -23,7 +24,10 @@ def parse_url_for_course_id(url: str) -> Optional[str]:
                 if token.startswith("course_id="):
                     return token[10:]
 
+
 def filter_by_role(items, role="Student"):
+    """Remove non-student item."""
+    imtermediate_vals = [item for item in items if item["courseRoleId"] == role]
     return [
-        item for item in items if item["courseRoleId"] == role
+        item for item in imtermediate_vals if not item["user"]["userName"].endswith("_previewuser")
     ]

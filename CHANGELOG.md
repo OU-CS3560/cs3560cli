@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- Finalize the format of the TSV data `blackboard student-list` outputs.
+
 ## v0.2.0a1
 
 - BREAKING CHANGE: Rename `cs3560cli.functions` to `cs3560cli.commands`.

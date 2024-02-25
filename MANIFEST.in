@@ -1,2 +1,3 @@
 include cs3560cli/VERSION
 graft cs3560cli/templates/
+graft cs3560cli/static/
