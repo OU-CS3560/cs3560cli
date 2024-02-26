@@ -19,7 +19,6 @@ dependencies = [
     "watchdog",
     "requests",
     "flask",
-    "flask-cors",
 ]
 
 [project.optional-dependencies]

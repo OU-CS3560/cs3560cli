@@ -12,7 +12,6 @@ from pathlib import Path
 
 import click
 from flask import Flask, render_template, request
-from flask_cors import CORS
 
 from cs3560cli.blackboard import categorize, filter_by_role, parse_url_for_course_id
 
@@ -26,7 +25,6 @@ def create_app():
     app = Flask(
         __name__, template_folder=template_dir_path, static_folder=static_dir_path
     )
-    CORS(app)
 
     @app.route("/", methods=["GET", "POST"])
     def show_index():
