@@ -3,6 +3,7 @@
 ## Unreleased
 
 - Add `blackboard categorize` command from `krerkkiat/ta-tooling`.
+- Add `github get-team-id` command from `OU-CS3560/org-bulk-invite`.
 
 ## v0.2.0
 
