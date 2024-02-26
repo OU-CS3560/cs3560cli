@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "cs3560cli"
-description = "A set of internal tools for Ohio University's CS3560 course"
+description = "A set of internal tools for Ohio University's CS3560 course."
 readme = "README.md"
 license = {file = "LICENSE"}
 dynamic = ["version"]

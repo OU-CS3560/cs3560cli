@@ -5,8 +5,9 @@ The blackboard sub comamnd.
 import json
 import socket
 import sys
-import threading
+import time
 import webbrowser
+from multiprocessing import Process
 from pathlib import Path
 
 import click
@@ -130,17 +131,25 @@ def student_list_command(course_url):
         port = sock.getsockname()[1]
         sock.close()
 
-        webapp_thread = threading.Thread(
-            target=app.run, kwargs={"port": port, "debug": False}
-        )
-        webapp_thread.start()
+        server = Process(target=app.run, kwargs={"port": port, "debug": False})
+        server.start()
+
+        url = f"http://localhost:{port}/"
+        try:
+            webbrowser.open(url)
+        except:
+            click.echo(
+                f"Cannot open a browser to '{url}', please manually open the URL in your browser."
+            )
 
         try:
-            webbrowser.open(f"http://localhost:{port}/")
-        except:
-            pass
-
-        webapp_thread.join()
+            while True:
+                time.sleep(0.5)
+        except KeyboardInterrupt:
+            # signal will not work on Windows?
+            click.echo("Terminating the internal web server ...")
+            server.terminate()
+            server.join()
     else:
         course_id = parse_url_for_course_id(course_url)
         if course_id is None:
