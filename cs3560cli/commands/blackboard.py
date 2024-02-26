@@ -108,6 +108,11 @@ def create_app():
     return app
 
 
+def run_web_server(port):
+    app = create_app()
+    app.run(port=port, debug=False)
+
+
 @click.group()
 def blackboard():
     """Blackboard related tools."""
@@ -120,7 +125,6 @@ def student_list_command(course_url):
     """Obtain a list of student form Blackboard's API."""
     if course_url is None:
         """Show/open web UI."""
-        app = create_app()
 
         # Acquire a random port.
         # See https://stackoverflow.com/a/5089963/10163723
@@ -129,7 +133,7 @@ def student_list_command(course_url):
         port = sock.getsockname()[1]
         sock.close()
 
-        server = Process(target=app.run, kwargs={"port": port, "debug": False})
+        server = Process(target=run_web_server, args=(port,))
         server.start()
 
         url = f"http://localhost:{port}/"
