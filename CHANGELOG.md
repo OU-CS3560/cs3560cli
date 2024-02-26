@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## v0.2.1a1
+
 - Add `blackboard categorize` command from `krerkkiat/ta-tooling`.
 - Add `github get-team-id` command from `OU-CS3560/org-bulk-invite`.
 - Fix not being able to `Ctrl-C` the `blackboard student-list` command on Windows.
