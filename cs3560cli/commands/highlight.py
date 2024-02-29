@@ -22,6 +22,7 @@ from pathlib import Path
 import click
 from pygments import highlight as pygments_highlight
 from pygments.formatters import HtmlFormatter
+from pygments.lexer import Lexer
 from pygments.lexers import get_lexer_by_name, guess_lexer
 
 
@@ -38,7 +39,7 @@ def highlight_inline(code: str, lexer):
 @click.option("-l", "--lexer", default="", type=str)
 @click.pass_context
 def highlight(
-    ctx, in_file: str | Path = "-", out_file: str | Path = "-", lexer: str = ""
+    ctx, in_file: str | Path = "-", out_file: str | Path = "-", lexer: Lexer | str = ""
 ):
     """Get syntax highlighted code with inline style"""
     content = ""
@@ -54,10 +55,11 @@ def highlight(
             with open(in_file, "r") as in_f:
                 content = in_f.read()
 
-    if lexer == "":
-        lexer = guess_lexer(content)
-    else:
-        lexer = get_lexer_by_name(lexer)
+    if isinstance(lexer, str):
+        if lexer == "":
+            lexer = guess_lexer(content)
+        else:
+            lexer = get_lexer_by_name(lexer)
 
     result = highlight_inline(content, lexer)
 

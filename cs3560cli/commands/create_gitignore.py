@@ -47,7 +47,7 @@ def get_path(name: str) -> Optional[str]:
     return path_mapping[name]
 
 
-def normalize(name: str) -> Optional[str]:
+def normalize(name: str) -> str:
     """Apply alias and lower the case the name."""
     name = name.lower()
 
@@ -102,7 +102,7 @@ def create_gitignore(
     names: list[str],
     root: str | Path = ".",
     base: list[str] = ["windows", "macos"],
-) -> str:
+) -> None:
     """Create .gitignore content from list of names.
 
     Assume that names in bases area already normalized.

@@ -32,7 +32,7 @@ def check_url(url_template: str, usernames: list[str]) -> None:
 
 
 @click.command(name="check-username")
-@click.argument("filepath", type=click.Path("r"))
+@click.argument("filepath", type=click.Path(exists=True, readable=True))
 @click.option(
     "-s",
     "--site",

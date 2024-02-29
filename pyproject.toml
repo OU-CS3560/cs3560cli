@@ -23,6 +23,7 @@ dependencies = [
 
 [project.optional-dependencies]
 dev = ["pytest", "pytest-cov"]
+typ = ["mypy", "types-tqdm", "types-requests", "types-tqdm", "types-Pygments"]
 
 [project.urls]
 Homepage = "https://github.com/OU-CS3560/cs3560cli"

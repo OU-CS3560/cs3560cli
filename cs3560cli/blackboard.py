@@ -23,11 +23,13 @@ def parse_url_for_course_id(url: str) -> Optional[str]:
             raise ValueError()
         return tokens[course_kw_pos + 1]
     except ValueError:
+        # Maybe the course_id is presence in query.
         if len(u.query) != 0:
             tokens = u.query.split("&")
             for token in tokens:
                 if token.startswith("course_id="):
                     return token[10:]
+        return None
 
 
 def filter_by_role(items: list, role="Student") -> list:

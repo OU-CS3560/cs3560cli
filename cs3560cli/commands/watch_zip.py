@@ -36,6 +36,7 @@ def is_7z_available() -> bool:
             return False
         except subprocess.CalledProcessError:
             return False
+    return False
 
 
 def extract(path: Path):
