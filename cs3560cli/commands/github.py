@@ -19,7 +19,8 @@ def github():
 @click.argument("org_name")
 @click.argument("team_slug")
 @click.option("--token", default=None)
-def get_team_id_command(org_name, team_slug, token):
+@click.pass_context
+def get_team_id_command(ctx, org_name, team_slug, token):
     """Get team's ID from its slug."""
     if token is None:
         token = getpass.getpass("Token: ")
@@ -33,18 +34,36 @@ def get_team_id_command(org_name, team_slug, token):
             f"[error]: Cannot retrieve the team's ID for '{org_name}/{team_slug}'. "
             "Please make sure that the token has 'admin:org' permission and it is authorized with SAML SSO."
         )
-        click.exit(1)
+        ctx.exit(1)
 
 
 @github.command(name="bulk-invite")
 @click.argument("org_name")
 @click.argument("team_slug")
 @click.argument("email_address_file")
-@click.option("--token", default=None)
-def bulk_invite_command(org_name, team_slug, email_address_file, token):
-    """Invite multiple email addresses to the organization."""
+@click.option(
+    "--token",
+    default=None,
+    help="A personal access token with 'admin:org' permission. If your organization is using SSO-SAML, "
+    "your token must also be authorized for that organization as well. If this option is not given, "
+    "the program will ask for it before the operation.",
+)
+@click.pass_context
+def bulk_invite_command(ctx, org_name, team_slug, email_address_file, token):
+    """
+    Invite multiple email addresses to the organization.
+
+    Example Usages:
+
+    1) Pass in the email address via stdin.
+
+        \b
+        $ cs3560cli github bulk-invite OU-CS3560 entire-class-24f -
+    """
     if token is None:
-        token = getpass.getpass("Token: ")
+        token = getpass.getpass(
+            "Personal Access Token (with 'admin:org' permission, and is authorized for SSO-SAML if the organization is using it): "
+        )
 
     gh = GitHubApi(token=token)
 
@@ -54,7 +73,7 @@ def bulk_invite_command(org_name, team_slug, email_address_file, token):
             f"[error]: Cannot retrieve the team's ID for '{org_name}/{team_slug}'. "
             "Please make sure that the token has 'admin:org' permission and it is authorized with SAML SSO."
         )
-        click.exit(1)
+        ctx.exit(1)
 
     if email_address_file == "-":
         # Read in from the stdin.

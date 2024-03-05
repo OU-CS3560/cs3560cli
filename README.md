@@ -35,6 +35,20 @@ firstName       lastName        emailHandle     isDrop  github-username team-id 
 ... [formatted row of TSV data] ...
 ```
 
+You can then copy this TSV data and paste into Excel sheet or [Google Sheet](https://sheets.new/).
+
+### `blackboard categorize` Command
+
+When you download all submissions from an assignment, you will get a zip file with files from all students
+together in one place. This command can group files from a student together in a folder of their username.
+
+```console
+$ python -m cs3560cli blackboard categorize gradebook_CS_3560_100_LEC_SPRG_2023-24_HW2.zip hw2
+Categorizing files ...
+$ ls hw2/
+kc555014 ...
+```
+
 ### `watch-zip` Command
 
 Watch for an archive file and extract it. This can be useful when you are grading

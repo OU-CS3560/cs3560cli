@@ -4,6 +4,9 @@
 
 - Fix not being able to `Ctrl-C` the `blackboard student-list` command on Windows.
 - Fix mypy's errors/warnings.
+- Update commands' documentation.
+- Add `--file` option for `blackboard student-list`.
+- Fix `click.exit` does not exist by using `ctx.exit` instead.
 
 ## v0.2.1a1
 

@@ -14,6 +14,12 @@ To build
 python -m build
 ```
 
+To locally install
+
+```console
+python -m pip install -e ".[dev,typ]" --config-settings editable_mode=compat
+```
+
 ## Publishing
 
 For the detail about version specifier, please see [version specifier](https://packaging.python.org/en/latest/specifications/version-specifiers/)

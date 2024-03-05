@@ -121,12 +121,56 @@ def blackboard():
 
 @blackboard.command(name="student-list")
 @click.argument("course_url", nargs=1, required=False)
-def student_list_command(course_url):
-    """Obtain a list of student form Blackboard's API."""
-    if course_url is None:
+@click.option(
+    "--file",
+    default=None,
+    help="A path to the JSON file containing the enrollment data.",
+)
+@click.pass_context
+def student_list_command(ctx, course_url, file):
+    """
+    Obtain a list of student form Blackboard's API.
+
+    Example Usages:
+
+    1) Obtain the student enrollment data using Blackboard's API.
+
+        \b
+        $ cs3560cli blackboard student-list https://blackboard.ohio.edu/ultra/courses/_642196_1/cl/outline
+
+        Student list link:
+
+        \b
+        https://blackboard.ohio.edu/learn/api/public/v1/courses/_642196_1/users?fields=id,userId,user,courseRoleId
+
+        Visit the link above in your browser.
+        Then copy and paste in the JSON data below and hit Ctrl-D (EOF) (on Windows use Ctrl-Z then hit <return>) when you are done:
+
+        \b
+        {"results":[{"id":" ... output is removed for brevity ..
+
+        TSV data of the students:
+
+        \b
+        firstName       lastName        emailHandle     isDrop  github-username ... output is removed for brevity ...
+
+    2) Already have the course ID?
+
+        $ cs3560cli blackboard student-list _642196_1
+
+    3) Already have the enrollment data in a JSON file?
+
+        $ cs3560cli blackboard student-list --file cs3560-24f-enrollment.json
+
+    4) Want to use the web UI instead?
+
+        $ cs3560cli blackboard student-list
+    """
+    if course_url is None and file is None:
         """Show/open web UI."""
 
         # Acquire a random port.
+        # Possibly a race condition?
         # See https://stackoverflow.com/a/5089963/10163723
         sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         sock.bind(("localhost", 0))
@@ -153,19 +197,41 @@ def student_list_command(course_url):
             server.terminate()
             server.join()
     else:
-        course_id = parse_url_for_course_id(course_url)
-        if course_id is None:
-            print(f"[error]: Cannot parse '{course_url}' for course ID.")
-            click.exit(1)
+        if file is None:
+            if len(course_url) > 0 and course_url.strip()[0] == "_":
+                # Assume that the URL is the ID itself.
+                course_id = course_url
+            else:
+                course_id = parse_url_for_course_id(course_url)
+            if course_id is None:
+                print(f"[error]: Cannot parse '{course_url}' for course ID.")
+                ctx.exit(1)
 
-        print(
-            f"\nStudent list link:\n\n{STUDENT_LIST_URL.format(course_id=course_id)}\n\nVisit the link above in your browser."
-        )
-        print(
-            "Then copy and paste in the JSON data below and hit Ctrl-D (EOF) when you are done:\n"
-        )
+            print(
+                f"\nStudent list link:\n\n{STUDENT_LIST_URL.format(course_id=course_id)}\n\nVisit the link above in your browser."
+            )
+            print(
+                "Then copy and paste in the JSON data below and hit Ctrl-D (EOF) (on Windows use Ctrl-Z then hit <return>) when you are done:\n"
+            )
+            data = sys.stdin.read()
+        else:
+            path = Path(file)
+            if not path.exists():
+                click.echo(f"[error]: '{str(path)}' does not exist.")
+                ctx.exit(1)
+            elif not path.is_file():
+                click.echo(f"[error]: '{str(path)}' is not a file. ")
+                ctx.exit(1)
 
-        data = sys.stdin.read()
+            try:
+                with open(file, "r") as in_f:
+                    data = in_f.read()
+            except:
+                click.echo(
+                    f"[error]: An error occur while trying to read from a file '{str(path)}'"
+                )
+                ctx.exit(1)
+
         results = json.loads(data)
         students = filter_by_role(results["results"])
 
@@ -214,6 +280,21 @@ def student_list_command(course_url):
     required=True,
 )
 def categorize_command(source, destination):
-    """Group files from the same student together in a folder."""
+    """
+    Group files from the same student together in a folder.
+
+    Example Usages:
+
+    1) Categorize the gradebook zip file into 'hw2' folder.
+
+        \b
+        $ cs3560cli blackboard categorize gradebook_CS_3560_100_LEC_SPRG_2023-24_HW2.zip hw2
+        Categorizing files ...
+        $ ls hw2/
+        kc555014 ... output is removed for brevity ...
+    """
     click.echo("Categorizing files ...")
+    categorize(source, destination)
+    categorize(source, destination)
+    categorize(source, destination)
     categorize(source, destination)

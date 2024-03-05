@@ -59,4 +59,4 @@ class GitHubApi:
 
         Return the list of failed email addresses.
         """
-        pass
+        return email_addresses
