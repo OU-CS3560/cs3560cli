@@ -13,7 +13,7 @@ from pathlib import Path
 import click
 from flask import Flask, render_template, request
 
-from cs3560cli.blackboard import categorize, filter_by_role, parse_url_for_course_id
+from cs3560cli.lms.blackboard import categorize, filter_by_role, parse_url_for_course_id
 
 template_dir_path = Path(__file__).parent.parent / "templates"
 static_dir_path = Path(__file__).parent.parent / "static"
