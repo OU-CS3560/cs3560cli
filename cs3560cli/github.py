@@ -1,3 +1,4 @@
+from time import sleep
 from typing import Optional
 
 import requests
@@ -22,9 +23,15 @@ class GitHubApi:
         if res.status_code == 200:
             data = res.json()
             return data["id"]
+        elif res.status_code == 401:
+            raise PermissionError(
+                "Does not have enough permission to retrive the team's id."
+            )
+        elif res.status_code == 404:
+            return None
         return None
 
-    def invite_to_org(self, org_name: str, email_address: str, team_id: int) -> bool:
+    def invite_to_org(self, org_name: str, team_id: int, email_address: str) -> bool:
         """
         Invite a user to the organization.
         """
@@ -45,7 +52,7 @@ class GitHubApi:
         res = requests.post(
             f"https://api.github.com/orgs/{org_name}/invitations",
             headers=headers,
-            data=payload,
+            json=payload,
         )
         if res.status_code == 201:
             return True
@@ -53,10 +60,20 @@ class GitHubApi:
             return False
 
     def bulk_invite_to_org(
-        self, org_name: str, email_addresses: list[str]
+        self,
+        org_name: str,
+        team_id: int,
+        email_addresses: list[str],
+        delay_between_request: float = 1,
     ) -> list[str]:
         """Sending invitation to multiple email addresses.
 
         Return the list of failed email addresses.
         """
-        return email_addresses
+        failed_invitations = []
+        for email_address in email_addresses:
+            if not self.invite_to_org(org_name, team_id, email_address):
+                failed_invitations.append(email_address)
+            sleep(delay_between_request)
+
+        return failed_invitations
