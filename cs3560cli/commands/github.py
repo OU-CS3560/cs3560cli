@@ -7,6 +7,7 @@ import sys
 import click
 
 from cs3560cli.github import GitHubApi
+from cs3560cli.lms.canvas import CanvasApi
 
 
 @click.group()
@@ -108,6 +109,84 @@ def bulk_invite_command(
         if email_address_filepath != "-":
             file_obj.close()
 
+        failed_email_addresses = gh.bulk_invite_to_org(
+            org_name, team_id, email_addresses, delay_between_request=delay
+        )
+        for email_address in failed_email_addresses:
+            print(f"Failed to invite {email_address}")
+
+    except PermissionError:
+        click.echo(
+            f"[error]: Cannot retrieve the team's ID for '{org_name}/{team_slug}'. "
+            "Please make sure that the token has 'admin:org' permission and it is authorized with SAML SSO."
+        )
+
+
+@github.command(name="bulk-invite-from-canvas")
+@click.argument("course_id")
+@click.argument("org_name")
+@click.argument("team_slug")
+@click.option(
+    "--canvas-token",
+    prompt=True,
+    hide_input=True,
+    confirmation_prompt=False,
+    help="A Canvas access token which can be obtained from the 'Approved Integrations' section on https://ohio.instructure.com/profile/settings page.",
+)
+@click.option(
+    "--gh-token",
+    prompt=True,
+    hide_input=True,
+    confirmation_prompt=False,
+    help="A personal access token with the 'admin:org' permission. If your organization is using SSO-SAML, "
+    "your token must also be SSO-SAML authorized for that organization as well.",
+)
+@click.option(
+    "--delay",
+    type=int,
+    default=1,
+    help="A delay in second between invitation request.",
+)
+@click.pass_context
+def bulk_invite_from_canvas_command(
+    ctx,
+    course_id,
+    org_name,
+    team_slug,
+    canvas_token,
+    gh_token,
+    delay,
+):
+    """
+    Invite multiple email addresses to the organization.
+
+    Example Usages:
+
+    1) Send invitation to join OU-CS3560/entire-class-24f team to all students in a Canvas' course with ID 24840.
+
+        \b
+        $ cs3560cli github bulk-invite-from-canvas --token 24840 OU-CS3560 entire-class-24f
+        Canvas Token: <enter your Canvas' access token>
+        Gh Token: <enter your GitHub personal acces token with appropriate permission and SSO-SAML enabled>
+    """
+    canvas = CanvasApi(token=canvas_token)
+    students = canvas.get_students(course_id)
+    email_addresses = [s["user"]["email"] for s in students]
+    click.echo(f"Found {len(email_addresses)} students in course id={course_id}.")
+
+    gh = GitHubApi(token=gh_token)
+
+    try:
+        team_id = gh.get_team_id_from_slug(org_name, team_slug)
+        if team_id is None:
+            click.echo(
+                f"[error]: Cannot retrieve the team's ID for '{org_name}/{team_slug}'. Please make sure the team name is correct."
+            )
+            ctx.exit(1)
+
+        click.echo(
+            f"Sending invitations to join {org_name}/{team_slug} (team_id={team_id}) ..."
+        )
         failed_email_addresses = gh.bulk_invite_to_org(
             org_name, team_id, email_addresses, delay_between_request=delay
         )

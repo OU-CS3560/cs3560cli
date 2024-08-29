@@ -7,6 +7,9 @@
 - Update commands' documentation.
 - Add `--file` option for `blackboard student-list`.
 - Fix `click.exit` does not exist by using `ctx.exit` instead.
+- Add support for Canvas
+- Add support for GitHub's API
+- Add a command that invites students to a team on GitHub Organization directly from Canvas LMS.
 
 ## v0.2.1a1
 

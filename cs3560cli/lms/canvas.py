@@ -67,6 +67,7 @@ class CanvasApi:
             ]
             students = []
             for member in course_members:
+                # There is a "Test Student" that has no value in the email field.
                 if (
                     member["sisRole"] == "student"
                     and member["user"]["email"] is not None
