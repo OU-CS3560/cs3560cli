@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## v0.2.1a2
+
 - Fix not being able to `Ctrl-C` the `blackboard student-list` command on Windows.
 - Fix mypy's errors/warnings.
 - Update commands' documentation.
