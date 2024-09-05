@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+## v0.2.1a3
+
+- Include `cs3560cli.lms` package.
+
 ## v0.2.1a2
 
 - Fix not being able to `Ctrl-C` the `blackboard student-list` command on Windows.

@@ -108,7 +108,7 @@ gh api \
   -f notification_setting='notifications_disabled' \
   -f privacy='closed'
 gh repo-collab add OU-CS3560/examples "OU-CS3560/$TeamName" --permission read
-python -m cs3560 github bulk-invite
+python -m cs3560cli github bulk-invite
 ```
 
 ### Creating repositories for teams
@@ -130,7 +130,7 @@ $TeamId = ""
 $TeamHandle = "OU-CS3560/" + $TeamId
 $RepoHandle = "OU-CS3560/" + $TeamId
 
-$ParentTeamId = python -m cs3560 github get-team-id entire-class-24f | Out-String
+$ParentTeamId = python -m cs3560cli github get-team-id entire-class-24f | Out-String
 gh api \
   --method POST \
   -H "Accept: application/vnd.github+json" \
