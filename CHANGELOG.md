@@ -2,6 +2,9 @@
 
 ## Unreleased
 
+- Add `CanvasApi.get_submissions`.
+- Add `CanvasApi.get_groups_by_groupset_name`.
+
 ## v0.2.1a3
 
 - Include `cs3560cli.lms` package.

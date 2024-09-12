@@ -130,7 +130,7 @@ $TeamId = ""
 $TeamHandle = "OU-CS3560/" + $TeamId
 $RepoHandle = "OU-CS3560/" + $TeamId
 
-$ParentTeamId = python -m cs3560cli github get-team-id entire-class-24f | Out-String
+$ParentTeamId = python -m cs3560cli github get-team-id OU-CS3560 entire-class-24f | Out-String
 gh api \
   --method POST \
   -H "Accept: application/vnd.github+json" \
