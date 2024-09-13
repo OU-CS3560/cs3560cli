@@ -21,6 +21,40 @@ def test_parse_url_for_course_id():
     )
 
 
+class MockSuccessfulListSubmissionsResponse:
+    @property
+    def status_code(self):
+        return 200
+
+    @staticmethod
+    def json():
+        return {
+            "data": {
+                "assignment": {
+                    "submissionsConnection": {
+                        "nodes": [
+                            {
+                                "submissionStatus": "submitted",
+                                "url": "https://github.com/OU-CS3560/hw-make-rb000000",
+                                "user": {"email": "rb000000@ohio.edu"},
+                            },
+                            {
+                                "submissionStatus": "submitted",
+                                "url": "https://github.com/OU-CS3560/hw-make-rb000000.git",
+                                "user": {"email": "rb000001@ohio.edu"},
+                            },
+                            {
+                                "submissionStatus": "submitted",
+                                "url": "https://github.com/OU-CS3560/hw-make-rb000000?tab=readme-ov-file",
+                                "user": {"email": "rb000002@ohio.edu"},
+                            },
+                        ]
+                    }
+                }
+            }
+        }
+
+
 class MockSuccessfulGroupSetResponse:
     @property
     def status_code(self):
@@ -83,6 +117,18 @@ class MockSuccessfulGroupSetResponse:
                 }
             }
         }
+
+
+def test_get_submissions(monkeypatch):
+    def mock_post(*args, **kwargs):
+        return MockSuccessfulListSubmissionsResponse()
+
+    monkeypatch.setattr(requests, "post", mock_post)
+
+    client = CanvasApi(token="fake-token")
+
+    submissions = client.get_submissions("0")
+    assert len(submissions) == 3
 
 
 def test_get_groups_by_groupset_name(monkeypatch):
