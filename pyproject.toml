@@ -22,8 +22,8 @@ dependencies = [
 ]
 
 [project.optional-dependencies]
-dev = ["pytest", "pytest-cov"]
-typ = ["mypy", "types-tqdm", "types-requests", "types-tqdm", "types-Pygments"]
+dev = ["pytest", "pytest-cov", "mypy", "ruff", "tox"]
+typ = ["types-tqdm", "types-requests", "types-tqdm", "types-Pygments"]
 
 [project.urls]
 Homepage = "https://github.com/OU-CS3560/cs3560cli"
@@ -40,8 +40,36 @@ include = ["cs3560cli*"]
 [tool.setuptools.dynamic]
 version = { file = "cs3560cli/VERSION" }
 
-[tool.isort]
-profile = "black"
+[tool.ruff]
+src = ["cs3560cli"]
+fix = true
+show-fixes = true
+output-format = "full"
+
+[tool.ruff.lint]
+select = [
+    "B",   # flake8-bugbear
+    "E",   # pycodestyle error
+    "F",   # pyflakes
+    "I",   # isort
+    "RUF", # ruff-specific rules
+    "UP",  # pyupgrade
+    "W",   # pycodestyle warning
+]
+ignore = [
+    "E501"  # Line too long
+]
+ignore-init-module-imports = true
+
+[tool.ruff.lint.isort]
+# So the imports in tests/ still sort the same way.
+known-first-party = ["cs3560cli"] 
+
+[tool.mypy]
+files = ["cs3560cli", "tests"]
+show_error_codes = true
+pretty = true
+strict = true
 
 [tool.pytest.ini_options]
 markers = [

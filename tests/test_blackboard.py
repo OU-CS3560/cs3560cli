@@ -1,3 +1,4 @@
+# type: ignore
 import pytest
 
 from cs3560cli.lms.blackboard import filter_by_role, parse_url_for_course_id

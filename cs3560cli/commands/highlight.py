@@ -10,7 +10,7 @@ Another reason is we want to use content of the file to determine
 the lexer instead of just a file name.
 
 Specification:
-- Must produce HTML with inline CSS, so it can be used in Blackboard.
+- Must produce HTML with inline CSS, so it can be used in LMS.
 
 Dependencies:
 - Pygments
@@ -26,7 +26,7 @@ from pygments.lexer import Lexer
 from pygments.lexers import get_lexer_by_name, guess_lexer
 
 
-def highlight_inline(code: str, lexer):
+def highlight_inline(code: str, lexer: Lexer) -> str:
     formatter = HtmlFormatter()
     formatter.noclasses = True
 
@@ -39,8 +39,11 @@ def highlight_inline(code: str, lexer):
 @click.option("-l", "--lexer", default="", type=str)
 @click.pass_context
 def highlight(
-    ctx, in_file: str | Path = "-", out_file: str | Path = "-", lexer: Lexer | str = ""
-):
+    ctx: click.Context,
+    in_file: str | Path = "-",
+    out_file: str | Path = "-",
+    lexer: Lexer | str = "",
+) -> None:
     """Get syntax highlighted code with inline style"""
     content = ""
     if isinstance(in_file, str):
@@ -50,9 +53,9 @@ def highlight(
         else:
             in_file = Path(in_file)
             if not in_file.exists():
-                ctx.fail(f"'{str(in_file)}' does not exist")
+                ctx.fail(f"'{in_file!s}' does not exist")
 
-            with open(in_file, "r") as in_f:
+            with open(in_file) as in_f:
                 content = in_f.read()
 
     if isinstance(lexer, str):
@@ -71,9 +74,9 @@ def highlight(
         else:
             outfile_path = Path(out_file)
             if outfile_path.exists():
-                ans = click.confirm(f"'{str(outfile_path)}' already exist, overwrite?")
+                ans = click.confirm(f"'{outfile_path!s}' already exist, overwrite?")
                 if not ans:
-                    click.echo(f"'{str(outfile_path)}' is not modified")
+                    click.echo(f"'{outfile_path!s}' is not modified")
                     ctx.exit()
 
             with open(outfile_path, "w") as out_f:

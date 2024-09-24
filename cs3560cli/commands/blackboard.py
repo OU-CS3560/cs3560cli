@@ -1,3 +1,4 @@
+# mypy: ignore-errors
 """
 The blackboard sub comamnd.
 """
@@ -6,6 +7,7 @@ import json
 import socket
 import sys
 import time
+import warnings
 import webbrowser
 from multiprocessing import Process
 from pathlib import Path
@@ -40,7 +42,7 @@ def create_app():
         link = STUDENT_LIST_URL.format(course_id=course_id)
         return f"""
 <div id="target" class="collapse bg-base-200">
-    <input type="radio" name="my-accordion-1" checked="checked" /> 
+    <input type="radio" name="my-accordion-1" checked="checked" />
     <div class="collapse-title text-xl font-medium">
         Visit this link and copy back the JSON data.
     </div>
@@ -91,7 +93,7 @@ def create_app():
             )
         return f"""
 <div class="collapse bg-base-200">
-    <input type="radio" name="my-accordion-1" checked="checked" /> 
+    <input type="radio" name="my-accordion-1" checked="checked" />
     <div class="collapse-title text-xl font-medium">
         Result
     </div>
@@ -113,13 +115,13 @@ def run_web_server(port):
     app.run(port=port, debug=False)
 
 
-@click.group()
+@click.group(deprecated=True)
 def blackboard():
     """Blackboard related tools."""
     pass
 
 
-@blackboard.command(name="student-list")
+@blackboard.command(name="student-list", deprecated=True)
 @click.argument("course_url", nargs=1, required=False)
 @click.option(
     "--file",
@@ -183,7 +185,7 @@ def student_list_command(ctx, course_url, file):
         url = f"http://localhost:{port}/"
         try:
             webbrowser.open(url)
-        except:
+        except webbrowser.Error:
             click.echo(
                 f"Cannot open a browser to '{url}', please manually open the URL in your browser."
             )
@@ -217,18 +219,18 @@ def student_list_command(ctx, course_url, file):
         else:
             path = Path(file)
             if not path.exists():
-                click.echo(f"[error]: '{str(path)}' does not exist.")
+                click.echo(f"[error]: '{path!s}' does not exist.")
                 ctx.exit(1)
             elif not path.is_file():
-                click.echo(f"[error]: '{str(path)}' is not a file. ")
+                click.echo(f"[error]: '{path!s}' is not a file. ")
                 ctx.exit(1)
 
             try:
-                with open(file, "r") as in_f:
+                with open(file) as in_f:
                     data = in_f.read()
-            except:
+            except OSError:
                 click.echo(
-                    f"[error]: An error occur while trying to read from a file '{str(path)}'"
+                    f"[error]: An error occur while trying to read from a file '{path!s}'"
                 )
                 ctx.exit(1)
 
@@ -264,7 +266,7 @@ def student_list_command(ctx, course_url, file):
             print(row)
 
 
-@blackboard.command(name="categorize")
+@blackboard.command(name="categorize", deprecated=True)
 @click.argument(
     "source",
     type=click.Path(
@@ -279,7 +281,7 @@ def student_list_command(ctx, course_url, file):
     ),
     required=True,
 )
-def categorize_command(source, destination):
+def categorize_command(source, destination) -> None:
     """
     Group files from the same student together in a folder.
 

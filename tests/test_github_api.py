@@ -1,3 +1,6 @@
+import typing as ty
+
+import pytest
 import requests
 
 from cs3560cli.github import GitHubApi
@@ -5,25 +8,25 @@ from cs3560cli.github import GitHubApi
 
 class MockSuccessfulGetTeamIdResponse:
     @property
-    def status_code(self):
+    def status_code(self) -> int:
         return 200
 
     @staticmethod
-    def json():
-        return {
-            "id":1000
-        }
+    def json() -> dict[str, ty.Any]:
+        return {"id": 1000}
+
 
 class MockSuccessfulInviteResponse:
     @property
-    def status_code(self):
+    def status_code(self) -> int:
         return 201
-    
+
     @staticmethod
-    def json():
+    def json() -> dict[str, ty.Any]:
         return {}
 
-def test_githubapi_get_team_id_from_slug(monkeypatch):
+
+def test_githubapi_get_team_id_from_slug(monkeypatch: pytest.MonkeyPatch) -> None:
     def mock_get(*args, **kwargs):
         return MockSuccessfulGetTeamIdResponse()
 
@@ -33,7 +36,7 @@ def test_githubapi_get_team_id_from_slug(monkeypatch):
     assert client.get_team_id_from_slug("OU-CS3560", "entire-class-20f") == 1000
 
 
-def test_githubapi_invite_to_org(monkeypatch):
+def test_githubapi_invite_to_org(monkeypatch: pytest.MonkeyPatch) -> None:
     def mock_post(*args, **kwargs):
         return MockSuccessfulInviteResponse()
 

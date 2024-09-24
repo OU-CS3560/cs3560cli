@@ -2,13 +2,11 @@
 Add .gitignore file (replace if any exist!).
 
 Instead of adding just the language/platform specific .gitignore
-from https://github.com/github/gitignore, it will also 
+from https://github.com/github/gitignore, it will also
 add all OS dependent .gitignore as well.
 """
 
-import traceback
 from pathlib import Path
-from typing import Optional
 
 import click
 import requests
@@ -36,7 +34,7 @@ class ApiError(Exception):
     pass
 
 
-def get_path(name: str) -> Optional[str]:
+def get_path(name: str) -> str | None:
     """Lookup the path.
 
     Assume name is in lowercase and is not an alias.
@@ -59,7 +57,7 @@ def normalize(name: str) -> str:
 
 def get_content(
     names: list[str],
-    bases: list[str] = ["windows", "macos"],
+    bases: list[str] | None = None,
     root: str = "https://raw.githubusercontent.com/github/gitignore/main/",
     header_text_template: str = "#\n# {path}\n# Get the latest version at https://github.com/github/gitignore/{path}\n#\n",
 ) -> str:
@@ -67,6 +65,9 @@ def get_content(
 
     Assume that names in bases area already normalized.
     """
+    if bases is None:
+        bases = ["windows", "macos"]
+
     final_text = ""
 
     names = bases + [normalize(name) for name in names if normalize(name) not in bases]
@@ -87,21 +88,21 @@ def get_content(
                 raise ApiError(
                     f"status code from API is not as expected. Expect 200 but get {res.status_code}"
                 )
-        except requests.exceptions.RequestException:
-            raise ApiError("error occur when fetching content")
+        except requests.exceptions.RequestException as e:
+            raise ApiError("error occur when fetching content") from e
     return final_text
 
 
 @click.command("create-gitignore")
 @click.argument("names", type=str, nargs=-1)
 @click.option("--root", type=click.Path(exists=True), default=".")
-@click.option("--base", type=str, multiple=True, default=["windows", "macos"])
+@click.option("--base", type=str, multiple=True, default=("windows", "macos"))
 @click.pass_context
 def create_gitignore(
-    ctx,
+    ctx: click.Context,
     names: list[str],
     root: str | Path = ".",
-    base: list[str] = ["windows", "macos"],
+    base: list[str] | tuple[str, ...] = ("windows", "macos"),
 ) -> None:
     """Create .gitignore content from list of names.
 
@@ -116,15 +117,15 @@ def create_gitignore(
     try:
         content = get_content(names, base)
     except ConnectionError as e:
-        ctx.fail("network error occured", e)
+        ctx.fail(f"network error occured\n{e}")
     except ApiError as e:
-        ctx.fail("api error occured", e)
+        ctx.fail(f"api error occured\n{e}")
 
     outfile_path = root / ".gitignore"
     if outfile_path.exists():
-        ans = click.confirm(f"'{str(outfile_path)}' already exist, overwrite?")
+        ans = click.confirm(f"'{outfile_path!s}' already exist, overwrite?")
         if not ans:
-            click.echo(f"'{str(outfile_path)}' is not modified")
+            click.echo(f"'{outfile_path!s}' is not modified")
             ctx.exit()
 
     with open(outfile_path, "w") as out_f:

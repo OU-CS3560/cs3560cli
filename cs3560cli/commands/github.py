@@ -3,6 +3,7 @@ The github subcommand.
 """
 
 import sys
+from pathlib import Path
 
 import click
 
@@ -11,7 +12,7 @@ from cs3560cli.lms.canvas import CanvasApi
 
 
 @click.group()
-def github():
+def github() -> None:
     """GitHub related tools."""
     pass
 
@@ -28,7 +29,9 @@ def github():
     "your token must also be SSO-SAML authorized for that organization as well.",
 )
 @click.pass_context
-def get_team_id_command(ctx, org_name, team_slug, token):
+def get_team_id_command(
+    ctx: click.Context, org_name: str, team_slug: str, token: str
+) -> int:
     """Get team's ID from its slug."""
     gh = GitHubApi(token=token)
     try:
@@ -63,14 +66,19 @@ def get_team_id_command(ctx, org_name, team_slug, token):
 )
 @click.option(
     "--delay",
-    type=int,
+    type=float,
     default=1,
     help="A delay in second between invitation request.",
 )
 @click.pass_context
 def bulk_invite_command(
-    ctx, org_name, team_slug, email_address_filepath, gh_token, delay
-):
+    ctx: click.Context,
+    org_name: str,
+    team_slug: str,
+    email_address_filepath: Path | str,
+    gh_token: str,
+    delay: float,
+) -> None:
     """
     Invite multiple email addresses to the organization.
 
@@ -93,7 +101,7 @@ def bulk_invite_command(
             )
             ctx.exit(1)
 
-        if email_address_filepath == "-":
+        if isinstance(email_address_filepath, str) and email_address_filepath == "-":
             # Read in from the stdin.
             file_obj = sys.stdin
         else:
@@ -143,20 +151,20 @@ def bulk_invite_command(
 )
 @click.option(
     "--delay",
-    type=int,
+    type=float,
     default=1,
     help="A delay in second between invitation request.",
 )
 @click.pass_context
 def bulk_invite_from_canvas_command(
-    ctx,
-    course_id,
-    org_name,
-    team_slug,
-    canvas_token,
-    gh_token,
-    delay,
-):
+    ctx: click.Context,
+    course_id: str,
+    org_name: str,
+    team_slug: str,
+    canvas_token: str,
+    gh_token: str,
+    delay: float,
+) -> None:
     """
     Invite multiple email addresses to the organization.
 
@@ -171,6 +179,9 @@ def bulk_invite_from_canvas_command(
     """
     canvas = CanvasApi(token=canvas_token)
     students = canvas.get_students(course_id)
+    if students is None:
+        click.echo("[error]: Cannot retrive student list from Canvas.")
+        ctx.exit(1)
     email_addresses = [s["user"]["email"] for s in students]
     click.echo(f"Found {len(email_addresses)} students in course id={course_id}.")
 

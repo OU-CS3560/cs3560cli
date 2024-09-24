@@ -23,7 +23,7 @@ WAIT_BEFORE_NEXT_REQUEST = 3  # [s]; delay a bit so we are not DOS the website.
 def check_url(url_template: str, usernames: list[str]) -> None:
     pbar = tqdm(usernames)
     for username in pbar:
-        pbar.set_description("Checking %s" % username)
+        pbar.set_description(f"Checking {username}")
         response = requests.get(url_template.format(username=username))
         if response.status_code != 200:
             tqdm.write(f"got {response.status_code} for {username}")
@@ -41,7 +41,7 @@ def check_url(url_template: str, usernames: list[str]) -> None:
     type=click.Choice(("gh", "cw")),
     help="Which website the username should be checked on (gh for GitHub, cw for Codewars)",
 )
-def check_username(filepath, site):
+def check_username(filepath: Path, site: str) -> None:
     """
     Username Existance Checker.
 
@@ -57,7 +57,7 @@ def check_username(filepath, site):
         filepath = Path(filepath)
 
     if filepath.exists() and filepath.is_file():
-        with open(filepath, "r") as f:
+        with open(filepath) as f:
             lines = f.readlines()
             usernames = [line.strip() for line in lines]
 
@@ -68,7 +68,7 @@ def check_username(filepath, site):
                 print("Checking Codewars Profiles")
                 check_url(CODEWARS_PROFILE_URL_TEMPLATE, usernames)
     else:
-        print(f"[error]: cannot open file '{str(filepath)}'")
+        print(f"[error]: cannot open file '{filepath!s}'")
 
 
 if __name__ == "__main__":

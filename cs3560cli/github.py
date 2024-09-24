@@ -1,15 +1,18 @@
+import typing as ty
 from time import sleep
-from typing import Optional
 
 import requests
 
 
-class GitHubApi:
+class GetTeamByNameResponse(ty.TypedDict):
+    id: int
 
+
+class GitHubApi:
     def __init__(self, token: str):
         self._token = token
 
-    def get_team_id_from_slug(self, org_name: str, team_slug: str) -> Optional[int]:
+    def get_team_id_from_slug(self, org_name: str, team_slug: str) -> int | None:
         headers = {
             "User-Agent": "cs3560cli",
             "Authorization": f"Bearer {self._token}",
@@ -21,7 +24,7 @@ class GitHubApi:
             f"https://api.github.com/orgs/{org_name}/teams/{team_slug}", headers=headers
         )
         if res.status_code == 200:
-            data = res.json()
+            data: GetTeamByNameResponse = res.json()
             return data["id"]
         elif res.status_code == 401:
             raise PermissionError(

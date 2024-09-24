@@ -1,3 +1,4 @@
+# type: ignore
 """
 Collection of functions for Blackboard.
 """
@@ -5,13 +6,19 @@ Collection of functions for Blackboard.
 import logging
 import os
 import re
+import warnings
 import zipfile
 from pathlib import Path
-from typing import Optional
 from urllib.parse import urlparse
 
+warnings.warn(
+    "This module is deprecated since Ohio University is switching over to Canvas.",
+    DeprecationWarning,
+    stacklevel=2,
+)
 
-def parse_url_for_course_id(url: str) -> Optional[str]:
+
+def parse_url_for_course_id(url: str) -> str | None:
     """Parse course URL for ID."""
     u = urlparse(url)
     tokens = u.path.split("/")
@@ -138,7 +145,7 @@ def categorize(source: Path | str, destination: Path | str):
         ]
 
     for raw_filename in files:
-        logging.info("raw file name: %s" % raw_filename)
+        logging.info("raw file name: %s" % raw_filename)  # noqa: UP031
 
         # Renaming.
         res = filename_pattern.findall(raw_filename)
@@ -146,7 +153,7 @@ def categorize(source: Path | str, destination: Path | str):
         if len(res) != 0:
             filename = res[0]
 
-        logging.info("file name: %s" % filename)
+        logging.info("file name: %s" % filename)  # noqa: UP031
 
         new_filename = ""
         if filename == ".txt":
@@ -154,7 +161,7 @@ def categorize(source: Path | str, destination: Path | str):
         else:
             new_filename = filename[1:]
 
-        logging.info("new file name: %s" % new_filename)
+        logging.info("new file name: %s" % new_filename)  # noqa: UP031
 
         # Get email handle.
         email_handle = email_handle_pattern.findall(raw_filename)[0]
@@ -175,8 +182,8 @@ def categorize(source: Path | str, destination: Path | str):
                     os.path.join(source, raw_filename),
                     os.path.join(destination, email_handle, new_filename),
                 )
-        except OSError as ex:
-            logging.error("oserror while operting on %s" % raw_filename)
+        except OSError:
+            logging.error("oserror while operting on %s" % raw_filename)  # noqa: UP031
 
     if zipfile.is_zipfile(source):
         zip_f.close()

@@ -9,7 +9,7 @@ from urllib.parse import urlparse
 import requests
 
 
-def parse_url_for_course_id(url: str) -> ty.Optional[str]:
+def parse_url_for_course_id(url: str) -> str | None:
     """Parse Canvas' course URL for course ID."""
     u = urlparse(url)
     tokens = u.path.split("/")
@@ -42,14 +42,14 @@ class GroupMember:
 @dataclass
 class Group:
     name: str
-    members: ty.List[GroupMember]
+    members: list[GroupMember]
 
 
 class CanvasApi:
     def __init__(self, token: str):
         self._token = token
 
-    def get_students(self, course_id: str) -> ty.Optional[ty.List[ty.Any]]:
+    def get_students(self, course_id: str) -> list[ty.Any] | None:
         """
         Retrive students in the course.
         """
@@ -98,7 +98,7 @@ class CanvasApi:
         else:
             return None
 
-    def get_submissions(self, assignment_id: str) -> ty.Optional[ty.List[Submission]]:
+    def get_submissions(self, assignment_id: str) -> list[Submission] | None:
         """Fetch submissions of the homework assignment.
 
         For now only the submission with type website URL is supported.
@@ -150,7 +150,7 @@ class CanvasApi:
 
     def get_groups_by_groupset_name(
         self, course_id: str, groupset_name: str
-    ) -> ty.Optional[ty.List[Group]]:
+    ) -> list[Group] | None:
         query = """
             query ListGroupsInGroupSet($courseId: ID!) {
                 course(id: $courseId) {
