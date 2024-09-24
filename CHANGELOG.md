@@ -1,9 +1,25 @@
 # Changelog
 
-## Unreleased
+All notable changes to this project will be documented in this file.
+
+The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
+and this project adheres to [Semantic Versioning](https://packaging.python.org/en/latest/discussions/versioning/).
+
+Note that the log for version before v0.2.1 may not be in the mentioned format.
+
+## [Unreleased]
+
+## v0.2.1 - 2024-09-24
+
+### Added
 
 - Add `CanvasApi.get_submissions`.
 - Add `CanvasApi.get_groups_by_groupset_name`.
+- Add mypy and type annotations.
+
+### Deprecated
+
+- Deprecate `lms.blackboard` and its related commands.
 
 ## v0.2.1a3
 
