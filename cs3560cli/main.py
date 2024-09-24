@@ -1,3 +1,5 @@
+import shutil
+
 import click
 
 from .commands.blackboard import blackboard
@@ -8,7 +10,9 @@ from .commands.highlight import highlight
 from .commands.watch_zip import watch_zip
 
 
-@click.group()
+@click.group(
+    context_settings={"max_content_width": shutil.get_terminal_size().columns - 10}
+)
 def cli() -> None:
     pass
 

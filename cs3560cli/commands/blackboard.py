@@ -7,7 +7,6 @@ import json
 import socket
 import sys
 import time
-import warnings
 import webbrowser
 from multiprocessing import Process
 from pathlib import Path

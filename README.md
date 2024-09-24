@@ -10,44 +10,20 @@ python -m pip install cs3560cli
 
 ## Features
 
-### `blackboard student-list` Command
+### Import students from Canvas into a team in GitHub Organization
 
-Offer a link to get student enrollment data and offer to parse the JSON data into TSV data for
-an Excel sheet or [Google Sheet](https://sheets.new/)
-
-Usage
-```console
-$ python -m cs3560cli blackboard student-list https://blackboard.ohio.edu/ultra/courses/_642196_1/cl/outline
-
-Student list link:
-
-https://blackboard.ohio.edu/learn/api/public/v1/courses/_642196_1/users?fields=id,userId,user,courseRoleId
-
-Visit the link above in your browser.
-Then copy and paste in the JSON data below and hit Ctrl-D (EOF) when you are done:
-
-... [JSON Data pasted in by the user] ...
-
-TSV data of the students:
-
-
-firstName       lastName        emailHandle     isDrop  github-username team-id team-name       m1      m2      m3      m4      final   assigned-ta      note    discord-username        codewars-username       userId  courseMembershipId
-... [formatted row of TSV data] ...
-```
-
-You can then copy this TSV data and paste into Excel sheet or [Google Sheet](https://sheets.new/).
-
-### `blackboard categorize` Command
-
-When you download all submissions from an assignment, you will get a zip file with files from all students
-together in one place. This command can group files from a student together in a folder of their username.
+If content of your course is in GitHub repository that requires students to be part of a GitHub's organization. The following command
+will automatically send email invitation to students' OHIO email addresses using information from Canvas.
 
 ```console
-$ python -m cs3560cli blackboard categorize gradebook_CS_3560_100_LEC_SPRG_2023-24_HW2.zip hw2
-Categorizing files ...
-$ ls hw2/
-kc555014 ...
+$ python -m cs3560cli github bulk-invite-from-canvas <course-id> <team-path> --with-canvas-token <canvas-token> --with-github-token <github-token>
 ```
+
+A team must exist in the organization. Access token for Canvas can be generated at https://ohio.instructure.com/profile/settings. Access token for GitHub can be generated at https://github.com/settings/tokens. Please make sure that the token has 'admin:org' permission and it is SSO-SAML authorized for your organization.
+
+### Group students submitted files into folders
+
+To be implemented for Canvas.
 
 ### `watch-zip` Command
 

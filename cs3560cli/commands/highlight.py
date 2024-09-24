@@ -16,8 +16,10 @@ Dependencies:
 - Pygments
 """
 
+import io
 import sys
 from pathlib import Path
+from typing import TextIO
 
 import click
 from pygments import highlight as pygments_highlight
@@ -26,8 +28,9 @@ from pygments.lexer import Lexer
 from pygments.lexers import get_lexer_by_name, guess_lexer
 
 
-def highlight_inline(code: str, lexer: Lexer) -> str:
-    formatter = HtmlFormatter()
+def highlight_inline(code: str, lexer: Lexer, linenos: str | bool = "inline") -> str:
+    """Return syntax highlighted HTML fragments of the code with inline style."""
+    formatter = HtmlFormatter(linenos=linenos)
     formatter.noclasses = True
 
     return pygments_highlight(code, lexer, formatter)
@@ -35,28 +38,43 @@ def highlight_inline(code: str, lexer: Lexer) -> str:
 
 @click.command("highlight")
 @click.argument("in-file", default="-", type=str)
-@click.option("-o", "--out-file", default="-", type=str)
-@click.option("-l", "--lexer", default="", type=str)
+@click.option(
+    "-o",
+    "--out-file",
+    default="-",
+    type=str,
+    help="Output file path. Use '-' for stdout. Default is to output to stdout.",
+)
+@click.option("-l", "--lexer", default="", type=str, help="E.g. python, cpp.")
 @click.pass_context
 def highlight(
     ctx: click.Context,
-    in_file: str | Path = "-",
-    out_file: str | Path = "-",
+    in_file: str | Path | TextIO = "-",
+    out_file: str | Path | TextIO = "-",
     lexer: Lexer | str = "",
 ) -> None:
-    """Get syntax highlighted code with inline style"""
+    """Generate syntax highlighted HTML fragments for the given code with inline style for LMS.
+
+    IN_FILE can be a path to a file or '-' for the command to read from stdin. If LEXER is provided,
+    said lexer will be used. If not, the lexer will be guessed based on the content.
+    """
     content = ""
     if isinstance(in_file, str):
         if in_file == "-":
-            for line in sys.stdin:
-                content += line
+            in_file = sys.stdin
         else:
             in_file = Path(in_file)
-            if not in_file.exists():
-                ctx.fail(f"'{in_file!s}' does not exist")
 
-            with open(in_file) as in_f:
-                content = in_f.read()
+    if isinstance(in_file, Path):
+        if not in_file.exists():
+            ctx.fail(f"'{in_file!s}' does not exist")
+
+        with open(in_file) as in_f:
+            content = in_f.read()
+
+    elif isinstance(in_file, io.TextIOBase):
+        for line in sys.stdin:
+            content += line
 
     if isinstance(lexer, str):
         if lexer == "":
@@ -68,19 +86,22 @@ def highlight(
 
     if isinstance(out_file, str):
         if out_file == "-":
-            # Pad the input and output a bit.
-            print("\n")
-            print(result)
+            out_file = sys.stdout
         else:
-            outfile_path = Path(out_file)
-            if outfile_path.exists():
-                ans = click.confirm(f"'{outfile_path!s}' already exist, overwrite?")
-                if not ans:
-                    click.echo(f"'{outfile_path!s}' is not modified")
-                    ctx.exit()
+            out_file = Path(out_file)
 
-            with open(outfile_path, "w") as out_f:
-                out_f.write(result)
+    if isinstance(out_file, Path):
+        if out_file.exists():
+            ans = click.confirm(f"'{out_file!s}' already exist, overwrite?")
+            if not ans:
+                click.echo(f"'{out_file!s}' is not modified")
+                ctx.exit()
+
+        with open(out_file, "w") as out_f:
+            out_f.write(result)
+
+    elif isinstance(out_file, io.TextIOBase):
+        print(result, end="", file=out_file)
 
 
 if __name__ == "__main__":

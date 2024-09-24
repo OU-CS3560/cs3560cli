@@ -114,7 +114,7 @@ class ArchiveFilesEventHandler(PatternMatchingEventHandler):
 @click.command("watch-zip")
 @click.option("--path", default=None, type=click.Path(exists=True))
 def watch_zip(path: Path) -> None:
-    """Watch for new zip file and extract it."""
+    """Watch for a new zip file and extract it."""
     if not is_7z_available():
         print(
             "This command requires 7z. For Windows, please install 7z from https://www.7-zip.org/. For linux the package name should be 'p7zip' or something similar."

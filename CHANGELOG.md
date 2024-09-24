@@ -9,6 +9,24 @@ Note that the log for version before v0.2.1 may not be in the mentioned format.
 
 ## [Unreleased]
 
+### Added
+
+- Add `github.GitHubApi.get_team_id_from_team_path`.
+- Add `github.is_team_path` function.
+- Add `github.get_github_token_from_gh_cli` function.
+- Add `github.get_github_token_from_environment_variable` function.
+- Add `github.get_github_token` function.
+- Add test cases for `github.GitHubApi`.
+- Add test cases for the top level CLI command.
+- Add test cases for the 'highlight' sub-command.
+
+### Changed
+
+- [BREAKING CHANGE] All `github` related commands now take team's path in the format of `<org-name>/<team-name>` instead of two separate arguments.
+- [BREAKING CHANGE] All `github` related commands now take `--with-token` or `--with-github-token` options.
+- `highlight` sub-command should now properly handle input and output paths.
+- Revise documentation for `highlight` sub-command.
+
 ## v0.2.1 - 2024-09-24
 
 ### Added
@@ -19,7 +37,7 @@ Note that the log for version before v0.2.1 may not be in the mentioned format.
 
 ### Deprecated
 
-- Deprecate `lms.blackboard` and its related commands.
+- Deprecate `lms.blackboard` and its related commands. Will be removed in v0.3.0.
 
 ## v0.2.1a3
 
