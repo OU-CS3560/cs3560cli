@@ -9,6 +9,8 @@ Note that the log for version before v0.2.1 may not be in the mentioned format.
 
 ## [Unreleased]
 
+
+
 ### Added
 
 - Add `github.GitHubApi.get_team_id_from_team_path`.
@@ -19,6 +21,7 @@ Note that the log for version before v0.2.1 may not be in the mentioned format.
 - Add test cases for `github.GitHubApi`.
 - Add test cases for the top level CLI command.
 - Add test cases for the 'highlight' sub-command.
+- Add `version` command.
 
 ### Changed
 
@@ -26,6 +29,15 @@ Note that the log for version before v0.2.1 may not be in the mentioned format.
 - [BREAKING CHANGE] All `github` related commands now take `--with-token` or `--with-github-token` options.
 - `highlight` sub-command should now properly handle input and output paths.
 - Revise documentation for `highlight` sub-command.
+- [BREAKING CHANGE] `create-gitignroe` command now asking for confirmations. The command now also show
+  that it is accessing resource on GitHub's repository via the network.
+- [BREAKING CHANGE] `path_mappings` and `aliases` (in `commands.create_gitignore`) are now just `ALIASES`. 
+- [BREAKING CHANGE] `--root` option of `create-gitignroe` is changed to `--outfile`.
+
+### Removed 
+
+- [BREAKING CHANGE] `get_path`, `normalize`. For the first, you can use `ALIASES` directly.
+- [BREAKING CHANGE] `get_content` is renamed to `build_gitignore_content`.
 
 ## v0.2.1 - 2024-09-24
 

@@ -2,6 +2,7 @@ import shutil
 
 import click
 
+from . import __version__
 from .commands.blackboard import blackboard
 from .commands.check_username import check_username
 from .commands.create_gitignore import create_gitignore
@@ -30,6 +31,13 @@ cli.add_command(highlight)
 def show_help(ctx: click.Context) -> None:
     """Show this help messages."""
     click.echo(cli.get_help(ctx))
+
+
+@cli.command(name="version")
+@click.pass_context
+def show_version(ctx: click.Context) -> None:
+    """Show version of the command."""
+    click.echo(__version__)
 
 
 if __name__ == "__main__":
