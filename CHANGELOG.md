@@ -9,7 +9,7 @@ Note that the log for version before v0.2.1 may not be in the mentioned format.
 
 ## [Unreleased]
 
-
+## v0.3.0 - 2024-10-02
 
 ### Added
 
