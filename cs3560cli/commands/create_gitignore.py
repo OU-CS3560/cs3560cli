@@ -27,6 +27,8 @@ ALIASES = {
     "kotlin": "Java.gitignore",
     "go": "Go.gitignore",
     "rust": "Rust.gitignore",
+    "haskell": "Haskell.gitignore",
+    "ocaml": "OCaml.gitignore",
     "unity": "Unity.gitignore",
     "tex": "TeX.gitignore",
     "latex": "TeX.gitignore",
