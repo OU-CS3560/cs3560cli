@@ -8,8 +8,10 @@ from pathlib import Path
 
 import click
 
-from cs3560cli.github import GitHubApi, is_team_path
-from cs3560cli.lms.canvas import CanvasApi
+from ..config import Config, pass_config
+from ..github import GitHubApi, is_team_path
+from ..lms.canvas import CanvasApi
+from .auth import update_canvas_token, update_github_token
 
 
 @click.group(
@@ -24,21 +26,20 @@ def github() -> None:
 @click.argument(
     "team_path",
 )
-@click.option(
-    "--with-token",
-    "gh_token",
-    default=None,
-    help="A personal access token with the 'admin:org' permission. If your organization is using SSO-SAML, "
-    "your token must also be SSO-SAML authorized for that organization as well.",
-)
+@pass_config
 @click.pass_context
 def get_team_id_command(
-    ctx: click.Context, team_path: str, gh_token: str | None
+    ctx: click.Context,
+    config: Config,
+    team_path: str,
 ) -> int:
     """Get team's ID from its TEAM_PATH.
 
     TEAM_PATH must be in '<org-name>/<team-name>' format."""
-    gh = GitHubApi(token=gh_token)
+    if not config.has_github_token():
+        ctx.invoke(update_github_token)
+
+    gh = GitHubApi(token=config.github_token)
 
     if not is_team_path(team_path):
         click.echo(
@@ -67,24 +68,18 @@ def get_team_id_command(
 @click.argument("team_path")
 @click.argument("email_address_filepath")
 @click.option(
-    "--with-token",
-    "gh_token",
-    default=None,
-    help="A personal access token with the 'admin:org' permission. If your organization is using SSO-SAML, "
-    "your token must also be SSO-SAML authorized for that organization as well.",
-)
-@click.option(
     "--delay",
     type=float,
     default=1.0,
     help="A delay in second between invitation request.",
 )
+@pass_config
 @click.pass_context
 def bulk_invite_command(
     ctx: click.Context,
+    config: Config,
     team_path: str,
     email_address_filepath: Path | str,
-    gh_token: str,
     delay: float,
 ) -> None:
     """
@@ -104,7 +99,9 @@ def bulk_invite_command(
         $ cs3560cli github bulk-invite OU-CS3560 entire-class-24f -
         bobcat@ohio.edu
     """
-    gh = GitHubApi(token=gh_token)
+    if not config.has_github_token():
+        ctx.invoke(update_github_token)
+    gh = GitHubApi(token=config.github_token)
 
     if not is_team_path(team_path):
         click.echo(
@@ -154,30 +151,18 @@ def bulk_invite_command(
 @click.argument("course_id")
 @click.argument("team_path")
 @click.option(
-    "--with-canvas-token",
-    "canvas_token",
-    help="A Canvas access token which can be obtained from the 'Approved Integrations' section on https://ohio.instructure.com/profile/settings page.",
-)
-@click.option(
-    "--with-github-token",
-    "github_token",
-    default=None,
-    help="A personal access token with the 'admin:org' permission. If your organization is using SSO-SAML, "
-    "your token must also be SSO-SAML authorized for that organization as well.",
-)
-@click.option(
     "--delay",
     type=float,
     default=1,
     help="A delay in second between invitation request.",
 )
+@pass_config
 @click.pass_context
 def bulk_invite_from_canvas_command(
     ctx: click.Context,
+    config: Config,
     course_id: str,
     team_path: str,
-    canvas_token: str,
-    github_token: str,
     delay: float,
 ) -> None:
     """
@@ -195,7 +180,12 @@ def bulk_invite_from_canvas_command(
             f"[error]: '{team_path}' is not in the required format, '<org-name>/<team-name>'."
         )
 
-    canvas = CanvasApi(token=canvas_token)
+    if not config.has_canvas_token():
+        ctx.invoke(update_canvas_token)
+    if not config.has_github_token():
+        ctx.invoke(update_github_token)
+
+    canvas = CanvasApi(token=config.canvas_token)
     students = canvas.get_students(course_id)
     if students is None:
         click.echo("[error]: Cannot retrive student list from Canvas.")
@@ -203,7 +193,7 @@ def bulk_invite_from_canvas_command(
     email_addresses = [s["user"]["email"] for s in students]
     click.echo(f"Found {len(email_addresses)} students in course id={course_id}.")
 
-    gh = GitHubApi(token=github_token)
+    gh = GitHubApi(token=config.github_token)
 
     try:
         team_id = gh.get_team_id_from_team_path(team_path)

@@ -75,7 +75,7 @@ class GitHubApi:
         if res.status_code == 200:
             data: GetTeamByNameResponse = res.json()
             return data["id"]
-        elif res.status_code == 401:
+        elif res.status_code == 401 or res.status_code == 403:
             raise PermissionError(
                 "Does not have enough permission to retrive the team's id."
             )
