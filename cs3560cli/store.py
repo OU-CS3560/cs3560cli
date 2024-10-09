@@ -46,7 +46,8 @@ class RedisStore(BaseStore):
     Required Redis instance.
     """
 
-    def __init__(self, client: redis.Redis[bytes]) -> None:
+    # If specify redis.Redis[bytes], mypy will be happy, but runtime error will occur.
+    def __init__(self, client: redis.Redis) -> None:  # type: ignore
         self.client = client
 
     def add_course(

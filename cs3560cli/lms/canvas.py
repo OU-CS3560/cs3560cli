@@ -18,11 +18,15 @@ def parse_url_for_course_id(url: str) -> str | None:
     u = urlparse(url)
     tokens = u.path.split("/")
 
-    course_kw_pos = tokens.index("courses")
-    if len(tokens) <= course_kw_pos + 1:
-        # e.g. url ends in /courses and has nothing else after.
+    try:
+        course_kw_pos = tokens.index("courses")
+        if len(tokens) <= course_kw_pos + 1:
+            # e.g. url ends in /courses and has nothing else after.
+            return None
+        return tokens[course_kw_pos + 1]
+    except ValueError:
+        # Exception raises by list.index().
         return None
-    return tokens[course_kw_pos + 1]
 
 
 def get_unique_names(path: Path | str) -> list[str]:
