@@ -141,3 +141,101 @@ class GitHubApi:
             sleep(delay_between_request)
 
         return failed_invitations
+
+    def create_team(
+        self,
+        name: str,
+        org_name: str,
+        description: str | None = None,
+        privacy: str = "closed",
+        notification_setting: str = "notifications_disabled",
+        parent_team_id: int | None = None,
+    ) -> None:
+        headers = {
+            "User-Agent": "cs3560cli",
+            "Content-Type": "application/json",
+            "Authorization": f"Bearer {self._token}",
+            "Accept": "application/vnd.github+json",
+            "X-GitHub-Api-Version": "2022-11-28",
+        }
+
+        payload = {
+            "name": name,
+            "privacy": privacy,
+            "notification_setting": notification_setting,
+        }
+        if description is not None:
+            payload["description"] = description
+        if parent_team_id is not None:
+            payload["parent_team_id"] = parent_team_id
+
+        res = requests.post(
+            f"https://api.github.com/orgs/{org_name}/teams",
+            headers=headers,
+            json=payload,
+        )
+        if res.status_code == 201:
+            return True
+        else:
+            return False
+
+    def add_team_to_repository(
+        self, team_path: str, repo_path: str, permission: str = "maintain"
+    ) -> bool:
+        team_org, team_name = team_path.split("/")
+        repo_owner, repo_name = repo_path.split("/")
+
+        headers = {
+            "User-Agent": "cs3560cli",
+            "Content-Type": "application/json",
+            "Authorization": f"Bearer {self._token}",
+            "Accept": "application/vnd.github+json",
+            "X-GitHub-Api-Version": "2022-11-28",
+        }
+
+        payload = {"permission": permission}
+
+        res = requests.put(
+            f"https://api.github.com/orgs/{team_org}/teams/{team_name}/repos/{repo_owner}/{repo_name}",
+            headers=headers,
+            json=payload,
+        )
+        if res.status_code == 201:
+            return True
+        else:
+            return False
+
+    def create_repository_with_template(
+        self,
+        repo_path: str,
+        template_repo_path: str,
+        private: bool = True,
+        description: str | None = None,
+    ) -> bool:
+        """
+        Create a repository from a template.
+        """
+        repo_owner, repo_name = repo_path.split("/")
+        template_repo_owner, template_repo_name = template_repo_path.split("/")
+
+        headers = {
+            "User-Agent": "cs3560cli",
+            "Content-Type": "application/json",
+            "Authorization": f"Bearer {self._token}",
+            "Accept": "application/vnd.github+json",
+            "X-GitHub-Api-Version": "2022-11-28",
+        }
+
+        payload = {"owner": repo_owner, "name": repo_name, "private": private}
+        if description is not None:
+            payload["description"] = description
+
+        res = requests.post(
+            f"https://api.github.com/repos/{template_repo_owner}/{template_repo_name}/generate",
+            headers=headers,
+            json=payload,
+        )
+        if res.status_code == 201:
+            return True
+        else:
+            return False

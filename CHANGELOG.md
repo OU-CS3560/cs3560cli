@@ -15,6 +15,7 @@ Note that the log for version before v0.2.1 may not be in the mentioned format.
 - Add tokens store via `cs3560cli.config`.
 - Add redis store interface (`store.BaseStore`, `store.RedisStore`).
 - Add `lms.canvas.categorize` function. `get_unique_names` was added to support it.
+- Add `create gh-team` command.
 
 ### Changed
 

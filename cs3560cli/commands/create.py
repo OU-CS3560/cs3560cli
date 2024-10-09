@@ -187,7 +187,7 @@ def create_gitignore(
 
 
 @create.command(name="gh-invite")
-@click.argument("team_path")
+@click.argument("team_path", type=str)
 @click.option("--from-canvas-course", "-c", type=str, default=None)
 @click.option("--from-file", "-f", type=str, default=None)
 @click.option(
@@ -249,6 +249,7 @@ def craete_github_invite(
         click.echo(
             f"[error]: '{team_path}' is not in the required format, '<org-name>/<team-name>'."
         )
+        ctx.exit(1)
 
     if not config.has_github_token():
         ctx.invoke(update_github_token)
@@ -324,6 +325,160 @@ def craete_github_invite(
         else:
             for email_address in email_addresses:
                 print(f"(dry-run) Inviting {email_address} ...")
+
+    except PermissionError:
+        print(
+            f"[red]Cannot retrieve the team's ID for '{team_path}'. "
+            "Please make sure that the token has 'admin:org' permission and it is authorized with SAML SSO."
+        )
+
+
+@create.command(name="gh-team")
+@click.argument("team_path", type=str)
+@click.option("--parent", "-p", type=str, default=None, required=True)
+@click.option("--description", "-d", type=str, default=None)
+@click.option(
+    "--privacy", type=click.Choice(choices=("closed", "secret")), default="closed"
+)
+@click.option("--template", "-t", type=str, default=None)
+@click.option("--invite", "-i", type=str, default=None)
+@click.option(
+    "--permission",
+    type=click.Choice(choices=("pull", "triage", "push", "maintain", "admin")),
+    default="maintain",
+)
+# Canvas related options.
+@click.option(
+    "--from-canvas-course",
+    "-c",
+    type=str,
+    default=None,
+    help="The Canvas course to look for the groupset.",
+)
+@click.option(
+    "--canvas-groupset-name",
+    "-g",
+    type=str,
+    default=None,
+    help="The groupset name containing the groups to create teams for.",
+)
+# Misc options.
+@click.option(
+    "--delay",
+    type=float,
+    default=1,
+    help="A delay in second between request.",
+)
+@click.option(
+    "--dry-run",
+    type=bool,
+    is_flag=True,
+    default=False,
+)
+@pass_config
+@click.pass_context
+def craete_github_team(
+    ctx: click.Context,
+    config: Config,
+    team_path: str,
+    parent: str | None = None,
+    description: str | None = None,
+    privacy: str = "closed",
+    template: str | None = None,
+    invite: str | None = None,
+    permission: str | None = "maintain",
+    from_canvas_course: str | None = None,
+    canvas_groupset_name: str | None = None,
+    delay: float = 1.0,
+    dry_run: bool = False,
+) -> None:
+    """
+    Create a team named TEAM_PATH under a PARENT team.
+
+    Optionally, create a repository with the same name from TEMPLATE and allow the team to access it with PERMISSION (default: maintain).
+    Optionally, invite list of comma separated email addresses in INVITE.
+
+    Groupset named CANVAS-GROUPSET-NAME can be used as a source of teams to be created under a PARENT team. A github team
+    will be created for each group found in CANVAS-GROUPSET-NAME groupset on course FROM-CANVAS-COURSE on Canvas.
+    """
+    # Sanity checks.
+    if not is_team_path(team_path):
+        click.echo(
+            f"[error]: '{team_path}' is not in the required format, '<org-name>/<team-name>'."
+        )
+        ctx.exit(1)
+    if parent is not None and not is_team_path(parent):
+        click.echo(
+            f"[error]: '{parent}' is not in the required format, '<org-name>/<team-name>'."
+        )
+        ctx.exit(1)
+    if template is not None and "/" not in template:
+        click.echo(
+            f"[error]: '{template}' is not in the required format, '<org-name>/<repo-name>'."
+        )
+        ctx.exit(1)
+
+    team_org_name, team_name = team_path.split("/")
+    parent_org_name, _ = parent.split("/")
+    if team_org_name != parent_org_name:
+        click.echo(
+            f"[error]: '{team_path}' and '{parent}' must be in the same organization."
+        )
+        ctx.exit(1)
+
+    # Token check.
+    if not config.has_github_token():
+        ctx.invoke(update_github_token)
+
+    # Data source for group information.
+    if from_canvas_course is not None:
+        if not config.has_canvas_token():
+            ctx.invoke(update_canvas_token)
+
+        # TODO: Obtain list of groups from groupset.
+        # The creation flow need to be adjusted to create multiple
+        # teams.
+
+    gh = GitHubApi(token=config.github_token)
+    try:
+        if parent is not None:
+            parent_team_id = gh.get_team_id_from_team_path(parent)
+            if parent_team_id is None:
+                print(
+                    f"[red]Cannot retrieve the team's ID for '{parent}'. Please make sure the team name is correct."
+                )
+                ctx.exit(1)
+        else:
+            parent_team_id = None
+
+        # Create a team under the parent (if parent is specified).
+        if not gh.create_team(
+            team_name,
+            team_org_name,
+            description=description,
+            privacy=privacy,
+            notification_setting="notifications_disabled",
+            parent_team_id=parent_team_id,
+        ):
+            click.echo(f"[error]: failed to create team.")
+            ctx.exit(1)
+
+        # Create a repository with the template.
+        if template is not None:
+            if not gh.create_repository_with_template(
+                team_path, template, private=True
+            ):
+                click.echo(f"[error]: failed to create a repository from the template.")
+                ctx.exit(1)
+
+            # Add team to this repository with the given permission.
+            if not gh.add_team_to_repository(
+                team_path, team_path, permission=permission
+            ):
+                click.echo(f"[error]: failed to add team to the repository.")
+                ctx.exit(1)
+
+        # TODO: If invite is presense, invite to the team.
 
     except PermissionError:
         print(
