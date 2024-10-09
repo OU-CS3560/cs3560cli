@@ -51,7 +51,7 @@ class RedisStore(BaseStore):
         self.client = client
 
     def add_course(
-        self, course_name: str, email_handles: list[str], overwrite: bool=False
+        self, course_name: str, email_handles: list[str], overwrite: bool = False
     ) -> None:
         key = STUDENTS_KEY_FORMAT.format(course_name=course_name)
         if self.client.exists(key) and not overwrite:

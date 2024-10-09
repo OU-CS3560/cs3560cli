@@ -13,11 +13,14 @@ def test_top_level_command() -> None:
 def test_highlight_command() -> None:
     runner = CliRunner()
     with runner.isolated_filesystem():
-        result = runner.invoke(cli, args=["highlight", "-"], input='print("Hello World")\n')
+        result = runner.invoke(
+            cli, args=["highlight", "-"], input='print("Hello World")\n'
+        )
         assert result.exit_code == 0
         assert not result.exception
         assert result.output.startswith("<div")
         assert "Hello" in result.output
+
 
 def test_highlight_command_input_via_file() -> None:
     runner = CliRunner()
