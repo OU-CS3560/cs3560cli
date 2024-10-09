@@ -23,6 +23,12 @@ Note that the log for version before v0.2.1 may not be in the mentioned format.
   manage tokens.
 - [BREAKING CHANGE] Re-structure the commands.
 
+### Removed
+
+- `services.blackboard` module (previously `lms.blackboard`).
+- All commands under `blackboard` group. Some commands depend on `flask`, but we will still keep it
+  since in the future, we want to implement GUI using this same approach. Last known code for `blackboard` is at commit `9526ab2c7ee036c9b0f26a190d9fc4a34ecb1a01`.
+
 ## v0.3.0 - 2024-10-02
 
 ### Added

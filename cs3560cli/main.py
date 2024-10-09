@@ -34,7 +34,6 @@ cli.add_command(get)
 cli.add_command(highlight)
 cli.add_command(watch)
 cli.add_command(students)
-# cli.add_command(blackboard)
 
 
 @cli.command(name="help")
