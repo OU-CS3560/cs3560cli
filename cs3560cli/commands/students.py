@@ -6,7 +6,7 @@ import click
 import redis
 
 from ..config import Config, pass_config
-from ..lms.canvas import CanvasApi
+from ..services.canvas import CanvasApi
 from ..store import RedisStore
 from .auth import update_canvas_token, update_redis_uri
 

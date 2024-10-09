@@ -4,7 +4,7 @@ from pathlib import Path
 
 import click
 
-from ..lms.canvas import categorize as categorize_step
+from ..services.canvas import categorize as categorize_step
 
 
 @click.command(name="categorize")

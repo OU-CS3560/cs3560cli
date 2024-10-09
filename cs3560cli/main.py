@@ -20,6 +20,9 @@ from .config import Config
 @click.option("--config-dir", type=str, default=None)
 @click.pass_context
 def cli(ctx: click.Context, config_dir: str | None) -> None:
+    """
+    A set of internal tools for Ohio University's CS3560 course.
+    """
     ctx.obj = Config(config_dir)
 
 

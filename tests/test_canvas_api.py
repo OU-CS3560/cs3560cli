@@ -3,7 +3,7 @@ import typing as ty
 import pytest
 import requests
 
-from cs3560cli.lms.canvas import CanvasApi, parse_url_for_course_id
+from cs3560cli.services.canvas import CanvasApi, parse_url_for_course_id
 
 
 def test_parse_url_for_course_id() -> None:

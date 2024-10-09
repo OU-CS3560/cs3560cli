@@ -3,7 +3,7 @@ import typing as ty
 import pytest
 import requests
 
-from cs3560cli.github import GitHubApi, is_team_path
+from cs3560cli.services.github import GitHubApi, is_team_path
 
 
 class MockSuccessfulGetTeamIdResponse:

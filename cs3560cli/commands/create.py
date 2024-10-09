@@ -11,8 +11,8 @@ from rich import print
 from rich.console import Console
 
 from ..config import Config, pass_config
-from ..github import GitHubApi, is_team_path
-from ..lms.canvas import CanvasApi, parse_url_for_course_id
+from ..services.canvas import CanvasApi, parse_url_for_course_id
+from ..services.github import GitHubApi, is_team_path
 from .auth import update_canvas_token, update_github_token
 
 

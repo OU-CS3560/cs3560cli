@@ -6,7 +6,7 @@ import click
 from rich import print
 
 from ..config import Config, pass_config
-from ..github import GitHubApi, is_team_path
+from ..services.github import GitHubApi, is_team_path
 from .auth import update_github_token
 
 
