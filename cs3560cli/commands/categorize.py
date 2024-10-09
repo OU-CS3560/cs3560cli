@@ -1,5 +1,7 @@
 """Group student submitted files into a folder."""
 
+from pathlib import Path
+
 import click
 
 from ..lms.canvas import categorize as categorize_step
@@ -20,7 +22,7 @@ from ..lms.canvas import categorize as categorize_step
     ),
     required=True,
 )
-def categorize(source, destination) -> None:
+def categorize(source: Path | str, destination: Path | str) -> None:
     """
     Group files from the same student together in a folder.
 

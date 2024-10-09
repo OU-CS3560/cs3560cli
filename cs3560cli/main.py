@@ -17,9 +17,9 @@ from .config import Config
 @click.group(
     context_settings={"max_content_width": shutil.get_terminal_size().columns - 10}
 )
-@click.option("--config-dir", default=None)
+@click.option("--config-dir", type=str, default=None)
 @click.pass_context
-def cli(ctx, config_dir) -> None:
+def cli(ctx: click.Context, config_dir: str | None) -> None:
     ctx.obj = Config(config_dir)
 
 

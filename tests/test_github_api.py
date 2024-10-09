@@ -32,7 +32,7 @@ def test_is_team_path() -> None:
 
 
 def test_githubapi_get_team_id_from_slug(monkeypatch: pytest.MonkeyPatch) -> None:
-    def mock_get(*args, **kwargs):
+    def mock_get(*args, **kwargs):  # type: ignore
         return MockSuccessfulGetTeamIdResponse()
 
     monkeypatch.setattr(requests, "get", mock_get)
@@ -42,7 +42,7 @@ def test_githubapi_get_team_id_from_slug(monkeypatch: pytest.MonkeyPatch) -> Non
 
 
 def test_githubapi_get_team_id_from_team_path(monkeypatch: pytest.MonkeyPatch) -> None:
-    def mock_get(*args, **kwargs):
+    def mock_get(*args, **kwargs):  # type: ignore
         return MockSuccessfulGetTeamIdResponse()
 
     monkeypatch.setattr(requests, "get", mock_get)
@@ -54,7 +54,7 @@ def test_githubapi_get_team_id_from_team_path(monkeypatch: pytest.MonkeyPatch) -
 
 
 def test_githubapi_invite_to_org(monkeypatch: pytest.MonkeyPatch) -> None:
-    def mock_post(*args, **kwargs):
+    def mock_post(*args, **kwargs):  # type: ignore
         return MockSuccessfulInviteResponse()
 
     monkeypatch.setattr(requests, "post", mock_post)

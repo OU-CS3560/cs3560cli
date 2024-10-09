@@ -46,11 +46,11 @@ class RedisStore(BaseStore):
     Required Redis instance.
     """
 
-    def __init__(self, client: redis.Client) -> None:
+    def __init__(self, client: redis.Redis[bytes]) -> None:
         self.client = client
 
     def add_course(
-        self, course_name: str, email_handles: list[str], overwrite=False
+        self, course_name: str, email_handles: list[str], overwrite: bool=False
     ) -> None:
         key = STUDENTS_KEY_FORMAT.format(course_name=course_name)
         if self.client.exists(key) and not overwrite:
@@ -72,7 +72,10 @@ class RedisStore(BaseStore):
         if not self.client.exists(key):
             raise ValueError(f"key '{key}' does not exists")
 
-        email_handles = self.client.get(key).decode().split(",")
+        res = self.client.get(key)
+        if res is None:
+            raise ValueError(f"key '{key}' has a value of 'None'.")
+        email_handles = res.decode().split(",")
 
         keys = [
             GITHUB_USERNAME_KEY_FORMAT.format(email_handle=email_handle.strip())

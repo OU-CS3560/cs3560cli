@@ -11,21 +11,22 @@ from ruamel.yaml import YAML
 
 
 class Config:
-    def __init__(self, config_dir=None):
-        self.config_dir = config_dir
-
+    def __init__(self, config_dir: Path | str | None = None) -> None:
         self.github_token = ""
         self.canvas_token = ""
         self.redis_uri = ""
 
-        if self.config_dir is None:
+        if config_dir is None:
+            self.config_dir = Path.home() / ".config" / "cs3560cli"
+
             if (
                 sys.platform == "linux"
-                and os.environ.get("XDG_CONFIG_HOME", None) is not None
             ):
-                self.config_dir = Path(os.environ.get("XDG_CONFIG_HOME")) / "cs3560cli"
-            else:
-                self.config_dir = Path.home() / ".config" / "cs3560cli"
+                user_config_home = os.environ.get("XDG_CONFIG_HOME", None)
+                if user_config_home is not None:
+                    self.config_dir = Path(user_config_home) / "cs3560cli"
+        elif isinstance(config_dir, str):
+            self.config_dir = Path(config_dir)
 
         self.config_dir.mkdir(parents=True, exist_ok=True)
 
@@ -45,7 +46,7 @@ class Config:
     def has_redis_uri(self) -> bool:
         return len(self.redis_uri) != 0
 
-    def restore(self):
+    def restore(self) -> None:
         yaml = YAML(typ="safe")
         doc = yaml.load(self.auth_file)
 
@@ -53,7 +54,7 @@ class Config:
         self.canvas_token = doc["auths"]["canvas"]["token"]
         self.redis_uri = doc["auths"]["redis"]["uri"]
 
-    def save(self):
+    def save(self) -> None:
         yaml = YAML(typ="safe")
         data = {
             "auths": {

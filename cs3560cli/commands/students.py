@@ -20,15 +20,15 @@ def students() -> None:
 
 
 @students.command(name="import")
-@click.argument("canvas_course_id")
-@click.argument("course_name")
+@click.argument("canvas_course_id", type=str)
+@click.argument("course_name", type=str)
 @click.option("--force", "-f", type=bool, default=False, is_flag=True)
 @pass_config
 @click.pass_context
 def import_students(
     ctx: click.Context,
     config: Config,
-    canvas_course_id: int,
+    canvas_course_id: str,
     course_name: str,
     force: bool,
 ) -> None:

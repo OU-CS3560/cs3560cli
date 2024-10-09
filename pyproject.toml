@@ -25,7 +25,8 @@ dependencies = [
 
 [project.optional-dependencies]
 dev = ["pytest", "pytest-cov", "mypy", "ruff", "tox"]
-typ = ["types-tqdm", "types-requests", "types-tqdm", "types-Pygments"]
+typ = ["types-tqdm", "types-requests", "types-tqdm", "types-Pygments", "types-redis"]
+# For types-redis, see https://github.com/redis/redis-py/issues/3091#issuecomment-1903419256
 
 [project.urls]
 Homepage = "https://github.com/OU-CS3560/cs3560cli"

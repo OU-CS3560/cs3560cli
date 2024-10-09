@@ -18,17 +18,14 @@ def parse_url_for_course_id(url: str) -> str | None:
     u = urlparse(url)
     tokens = u.path.split("/")
 
-    try:
-        course_kw_pos = tokens.index("courses")
-        if len(tokens) <= course_kw_pos + 1:
-            # e.g. url ends in /courses and has nothing else after.
-            raise ValueError()
-        return tokens[course_kw_pos + 1]
-    except ValueError:
+    course_kw_pos = tokens.index("courses")
+    if len(tokens) <= course_kw_pos + 1:
+        # e.g. url ends in /courses and has nothing else after.
         return None
+    return tokens[course_kw_pos + 1]
 
 
-def get_unique_names(path):
+def get_unique_names(path: Path | str) -> list[str]:
     """
     Return unique email handle in folder of submitted files.
 
@@ -64,7 +61,7 @@ def get_unique_names(path):
     return unique_names
 
 
-def categorize(source: Path | str, destination: Path | str):
+def categorize(source: Path | str, destination: Path | str) -> None:
     """
     Group files from the same student together in a folder.
 

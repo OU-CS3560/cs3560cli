@@ -263,13 +263,13 @@ def craete_github_invite(
             ctx.invoke(update_canvas_token)
 
         if from_canvas_course.startswith("http"):
-            try:
-                course_id = parse_url_for_course_id(from_canvas_course)
-            except ValueError:
+            course_id = parse_url_for_course_id(from_canvas_course)
+            if course_id is None:
                 print(
                     f"[red]Failed to parse '{from_canvas_course}' for course ID. We think that it is a URL, "
                     "please make sure the course id is part of it."
                 )
+                ctx.exit(1)
         else:
             course_id = from_canvas_course
 

@@ -123,7 +123,7 @@ class MockSuccessfulGroupSetResponse:
 
 
 def test_get_submissions(monkeypatch: pytest.MonkeyPatch) -> None:
-    def mock_post(*args, **kwargs):
+    def mock_post(*args, **kwargs):  # type: ignore
         return MockSuccessfulListSubmissionsResponse()
 
     monkeypatch.setattr(requests, "post", mock_post)
@@ -136,7 +136,7 @@ def test_get_submissions(monkeypatch: pytest.MonkeyPatch) -> None:
 
 
 def test_get_groups_by_groupset_name(monkeypatch: pytest.MonkeyPatch) -> None:
-    def mock_post(*args, **kwargs):
+    def mock_post(*args, **kwargs):  # type: ignore
         return MockSuccessfulGroupSetResponse()
 
     monkeypatch.setattr(requests, "post", mock_post)
