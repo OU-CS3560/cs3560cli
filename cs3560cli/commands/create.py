@@ -386,7 +386,7 @@ def craete_github_team(
     privacy: str = "closed",
     template: str | None = None,
     invite: str | None = None,
-    permission: str | None = "maintain",
+    permission: str = "maintain",
     from_canvas_course: str | None = None,
     canvas_groupset_name: str | None = None,
     delay: float = 1.0,
@@ -407,24 +407,25 @@ def craete_github_team(
             f"[error]: '{team_path}' is not in the required format, '<org-name>/<team-name>'."
         )
         ctx.exit(1)
-    if parent is not None and not is_team_path(parent):
-        click.echo(
-            f"[error]: '{parent}' is not in the required format, '<org-name>/<team-name>'."
-        )
-        ctx.exit(1)
     if template is not None and "/" not in template:
         click.echo(
             f"[error]: '{template}' is not in the required format, '<org-name>/<repo-name>'."
         )
         ctx.exit(1)
+    if parent is not None:
+        if not is_team_path(parent):
+            click.echo(
+                f"[error]: '{parent}' is not in the required format, '<org-name>/<team-name>'."
+            )
+            ctx.exit(1)
 
-    team_org_name, team_name = team_path.split("/")
-    parent_org_name, _ = parent.split("/")
-    if team_org_name != parent_org_name:
-        click.echo(
-            f"[error]: '{team_path}' and '{parent}' must be in the same organization."
-        )
-        ctx.exit(1)
+        team_org_name, team_name = team_path.split("/")
+        parent_org_name, _ = parent.split("/")
+        if team_org_name != parent_org_name:
+            click.echo(
+                f"[error]: '{team_path}' and '{parent}' must be in the same organization."
+            )
+            ctx.exit(1)
 
     # Token check.
     if not config.has_github_token():
@@ -460,7 +461,7 @@ def craete_github_team(
             notification_setting="notifications_disabled",
             parent_team_id=parent_team_id,
         ):
-            click.echo(f"[error]: failed to create team.")
+            click.echo("[error]: failed to create team.")
             ctx.exit(1)
 
         # Create a repository with the template.
@@ -468,14 +469,14 @@ def craete_github_team(
             if not gh.create_repository_with_template(
                 team_path, template, private=True
             ):
-                click.echo(f"[error]: failed to create a repository from the template.")
+                click.echo("[error]: failed to create a repository from the template.")
                 ctx.exit(1)
 
             # Add team to this repository with the given permission.
             if not gh.add_team_to_repository(
                 team_path, team_path, permission=permission
             ):
-                click.echo(f"[error]: failed to add team to the repository.")
+                click.echo("[error]: failed to add team to the repository.")
                 ctx.exit(1)
 
         # TODO: If invite is presense, invite to the team.

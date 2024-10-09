@@ -150,7 +150,7 @@ class GitHubApi:
         privacy: str = "closed",
         notification_setting: str = "notifications_disabled",
         parent_team_id: int | None = None,
-    ) -> None:
+    ) -> bool:
         headers = {
             "User-Agent": "cs3560cli",
             "Content-Type": "application/json",
@@ -159,7 +159,7 @@ class GitHubApi:
             "X-GitHub-Api-Version": "2022-11-28",
         }
 
-        payload = {
+        payload: dict[str, str | int] = {
             "name": name,
             "privacy": privacy,
             "notification_setting": notification_setting,
