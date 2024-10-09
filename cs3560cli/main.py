@@ -9,6 +9,7 @@ from .commands.check_username import check_username
 from .commands.create_gitignore import create_gitignore
 from .commands.github import github
 from .commands.highlight import highlight
+from .commands.students import students
 from .commands.watch_zip import watch_zip
 from .config import Config
 
@@ -28,6 +29,7 @@ cli.add_command(check_username)
 cli.add_command(watch_zip)
 cli.add_command(create_gitignore)
 cli.add_command(highlight)
+cli.add_command(students)
 cli.add_command(blackboard)
 
 

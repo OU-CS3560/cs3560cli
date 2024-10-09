@@ -9,6 +9,10 @@ Note that the log for version before v0.2.1 may not be in the mentioned format.
 
 ## [Unreleased]
 
+### Added
+
+- Add `students` command.
+
 ### Changed
 
 - [BREAKING CHANGE] Removal of `--with-token` flag since `auth` command is used to ask for and

@@ -19,6 +19,8 @@ dependencies = [
     "watchdog",
     "requests",
     "flask",
+    "redis",
+    "typing_extensions >=4.12, <5",
 ]
 
 [project.optional-dependencies]

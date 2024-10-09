@@ -57,7 +57,7 @@ def update_github_token(
 def update_canvas_token(
     config: Config,
 ) -> None:
-    if len(config.github_token.strip()) != 0:
+    if len(config.canvas_token.strip()) != 0:
         click.confirm(
             "Token already exists for Canvas, do you want to replace it?", abort=True
         )
@@ -75,7 +75,7 @@ def update_canvas_token(
 def update_redis_uri(
     config: Config,
 ) -> None:
-    if len(config.github_token.strip()) != 0:
+    if len(config.redis_uri.strip()) != 0:
         click.confirm(
             "URI for Redis connection already exists, do you want to replace it?",
             abort=True,
