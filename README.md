@@ -10,53 +10,12 @@ python -m pip install cs3560cli
 
 ## Features
 
-### Import students from Canvas into a team in GitHub Organization
-
-If content of your course is in GitHub repository that requires students to be part of a GitHub's organization. The following command
-will automatically send email invitation to students' OHIO email addresses using information from Canvas.
-
-```console
-$ python -m cs3560cli github bulk-invite-from-canvas <course-id> <team-path> --with-canvas-token <canvas-token> --with-github-token <github-token>
-```
-
-A team must exist in the organization. Access token for Canvas can be generated at https://ohio.instructure.com/profile/settings. Access token for GitHub can be generated at https://github.com/settings/tokens. Please make sure that the token has 'admin:org' permission and it is SSO-SAML authorized for your organization.
-
-### Group students submitted files into folders
-
-To be implemented for Canvas.
-
-### `watch-zip` Command
-
-Watch for an archive file and extract it. This can be useful when you are grading
-student's submission, so you do not have to manually unzip it.
-
-Usage
-
-```console
-$ python -m cs3560cli watch-zip .
-$ python -m cs3560cli watch-zip ~/Downloads
-```
-
-### `highlight` Command
-
-Create a syntax highlight code block with in-line style. The result can thus be embed into a content of LMS.
-
-### `create-gitignore` Command
-
-Create a `.gitignore` file using content from [github/gitignore repository](https://github.com/github/gitignore).
-
-Usage
-
-```console
-$ python -m cs3560cli create-gitignore python
-$ python -m cs3560cli create-gitignore cpp
-```
-
-By default, it also add `windows` and `macos` to the `.gitignore` file.
-
-### `check-username` Command
-
-TBD
+- `create gh-invite` : Invite students to a team in GitHub organization using data from Canvas.
+- `create gitignore` : Create an opinionated `.gitignore` file where `macOS.gitignore` and `Windows.gitignore` are included by default.
+- `watch` : Watch for (and extract) the zip file.
+- `highlight` : Create HTML fragments of a syntax highlighted snippet of code that can then be embeded in LMS.
+- `check github-username` : Check if the GitHub or Codewars username the student provided actually exist or not.
+- `categorize` : Group students submitted files and put them in a folder. One folder for each student.
 
 ## Scenario
 

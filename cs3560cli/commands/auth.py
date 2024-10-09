@@ -3,6 +3,7 @@
 import shutil
 
 import click
+from rich import print
 
 from ..config import Config, pass_config
 
@@ -42,9 +43,9 @@ def update_github_token(
             "Token already exists for GitHub, do you want to replace it?", abort=True
         )
 
-    click.echo(
+    print(
         "Please visit https://github.com/settings/tokens and create a personal access token with at least "
-        "repo and org:admin permission. If your organization is using SSO-SAML, your token must also be "
+        "[bold blue]repo[/] and [bold blue]org:admin[/] permission. If your organization is using SSO-SAML, your token must also be "
         "SSO-SAML authorized for that organization as well.\n"
     )
     token = click.prompt("GitHub Personal Access Token", hide_input=True)

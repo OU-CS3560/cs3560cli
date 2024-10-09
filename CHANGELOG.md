@@ -12,11 +12,15 @@ Note that the log for version before v0.2.1 may not be in the mentioned format.
 ### Added
 
 - Add `students` command.
+- Add tokens store via `cs3560cli.config`.
+- Add redis store interface (`store.BaseStore`, `store.RedisStore`).
+- Add `lms.canvas.categorize` function. `get_unique_names` was added to support it.
 
 ### Changed
 
 - [BREAKING CHANGE] Removal of `--with-token` flag since `auth` command is used to ask for and
   manage tokens.
+- [BREAKING CHANGE] Re-structure the commands.
 
 ## v0.3.0 - 2024-10-02
 

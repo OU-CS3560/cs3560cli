@@ -46,7 +46,7 @@ class RedisStore(BaseStore):
     Required Redis instance.
     """
 
-    def __init__(self, client: redis.client) -> None:
+    def __init__(self, client: redis.Client) -> None:
         self.client = client
 
     def add_course(

@@ -4,13 +4,13 @@ import click
 
 from . import __version__
 from .commands.auth import auth
-from .commands.blackboard import blackboard
-from .commands.check_username import check_username
-from .commands.create_gitignore import create_gitignore
-from .commands.github import github
+from .commands.categorize import categorize
+from .commands.check import check
+from .commands.create import create
+from .commands.get import get
 from .commands.highlight import highlight
 from .commands.students import students
-from .commands.watch_zip import watch_zip
+from .commands.watch import watch
 from .config import Config
 
 
@@ -24,13 +24,14 @@ def cli(ctx, config_dir) -> None:
 
 
 cli.add_command(auth)
-cli.add_command(github)
-cli.add_command(check_username)
-cli.add_command(watch_zip)
-cli.add_command(create_gitignore)
+cli.add_command(categorize)
+cli.add_command(check)
+cli.add_command(create)
+cli.add_command(get)
 cli.add_command(highlight)
+cli.add_command(watch)
 cli.add_command(students)
-cli.add_command(blackboard)
+# cli.add_command(blackboard)
 
 
 @cli.command(name="help")

@@ -4,7 +4,6 @@ Use pypi/watchdog to watch for and unpack archive file.
 For now it is hard coded to use 7z.exe (7z on linux) to extract the file.
 """
 
-import os
 import subprocess
 import sys
 import time
@@ -111,9 +110,10 @@ class ArchiveFilesEventHandler(PatternMatchingEventHandler):
             extract(path)
 
 
-@click.command("watch-zip")
-@click.option("--path", default=None, type=click.Path(exists=True))
-def watch_zip(path: Path) -> None:
+@click.command("watch")
+@click.argument("path", type=str, default=None, required=False)
+@click.pass_context
+def watch(ctx: click.Context, path: Path) -> None:
     """Watch for a new zip file and extract it."""
     if not is_7z_available():
         print(
@@ -122,7 +122,13 @@ def watch_zip(path: Path) -> None:
         sys.exit(0)
 
     if path is None:
-        path = os.getcwd()
+        path = Path.cwd()
+    elif isinstance(path, str):
+        path = Path(path)
+
+    if not path.exists():
+        print(f"[red]'{path}' does not exist.")
+        ctx.exit(1)
 
     event_handler = ArchiveFilesEventHandler()
     observer = Observer()
@@ -135,7 +141,3 @@ def watch_zip(path: Path) -> None:
     finally:
         observer.stop()
         observer.join()
-
-
-if __name__ == "__main__":
-    watch_zip()

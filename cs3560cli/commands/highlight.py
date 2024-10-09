@@ -46,12 +46,19 @@ def highlight_inline(code: str, lexer: Lexer, linenos: str | bool = "inline") ->
     help="Output file path. Use '-' for stdout. Default is to output to stdout.",
 )
 @click.option("-l", "--lexer", default="", type=str, help="E.g. python, cpp.")
+@click.option(
+    "--line-number/--no-line-number",
+    default=True,
+    type=bool,
+    help="Show or hide line numbers.",
+)
 @click.pass_context
 def highlight(
     ctx: click.Context,
     in_file: str | Path | TextIO = "-",
     out_file: str | Path | TextIO = "-",
     lexer: Lexer | str = "",
+    line_number: bool = False,
 ) -> None:
     """Generate syntax highlighted HTML fragments for the given code with inline style for LMS.
 
@@ -82,7 +89,9 @@ def highlight(
         else:
             lexer = get_lexer_by_name(lexer)
 
-    result = highlight_inline(content, lexer)
+    result = highlight_inline(
+        content, lexer, linenos="inline" if line_number else False
+    )
 
     if isinstance(out_file, str):
         if out_file == "-":
@@ -102,7 +111,3 @@ def highlight(
 
     elif isinstance(out_file, io.TextIOBase):
         print(result, end="", file=out_file)
-
-
-if __name__ == "__main__":
-    highlight()

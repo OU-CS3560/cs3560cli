@@ -2,8 +2,12 @@
 Collection of functions for Canvas LMS.
 """
 
+import logging
+import os
 import typing as ty
+import zipfile
 from dataclasses import dataclass
+from pathlib import Path
 from urllib.parse import urlparse
 
 import requests
@@ -22,6 +26,118 @@ def parse_url_for_course_id(url: str) -> str | None:
         return tokens[course_kw_pos + 1]
     except ValueError:
         return None
+
+
+def get_unique_names(path):
+    """
+    Return unique email handle in folder of submitted files.
+
+    :param path: A path to folder containing files extracted from downlaoded zip file.
+    :type path: str, pathlib.Path
+    :return: List of unique names.
+    :rtype: list[str]
+    :raises ValueError: When path is not a directory.
+    """
+
+    if isinstance(path, str):
+        path = Path(path)
+
+    if not (path.is_dir() or zipfile.is_zipfile(path)):
+        raise ValueError(f"path ({path}) need to be a directory or a zip file.")
+
+    # Get all files.
+    if zipfile.is_zipfile(path):
+        with zipfile.ZipFile(path, mode="r") as zip_f:
+            files = zip_f.namelist()
+    else:
+        files = [f for f in os.listdir(path) if os.path.isfile(os.path.join(path, f))]
+
+    names = []
+    # Extract handles.
+    for filename in files:
+        tokens = filename.split("_")
+
+        if len(tokens) != 0:
+            names.append(tokens[0])
+
+    unique_names = list(set(names))
+    return unique_names
+
+
+def categorize(source: Path | str, destination: Path | str):
+    """
+    Group files from the same student together in a folder.
+
+    Pre-condition: A root_directory is the result of the
+    extracting a files out from the archive file from Blackboard.
+
+    Post-condition: In the destination folder, folders for each student
+    will be created, and a file will be moved into its corresponding
+    folder.
+
+    :param source: A path to source directory.
+    :type source: str, pathlib.Path
+
+    :param destination: A path to destination directory.
+    :type destination: str, pathlib.Path
+
+    :raises ValueError: When path is not a directory.
+    """
+
+    if isinstance(source, str):
+        source = Path(source)
+    if isinstance(destination, str):
+        destination = Path(destination)
+
+    if not (source.is_dir() or zipfile.is_zipfile(source)):
+        raise ValueError(f"source ({source}) is not a directory nor a zip file")
+
+    # Get list of student email handles.
+    unique_names = get_unique_names(source)
+
+    # Create destination if not exist.
+    if not destination.exists():
+        os.mkdir(destination)
+    elif not destination.is_dir():
+        raise ValueError(f"destination ({destination}) exists and is not a directory")
+
+    # Create folders in the destination.
+    for name in unique_names:
+        if not os.path.exists(os.path.join(destination, name)):
+            os.mkdir(os.path.join(destination, name))
+
+    # Renaming and move files into directory.
+    if zipfile.is_zipfile(source):
+        zip_f = zipfile.ZipFile(source, mode="r")
+        files = zip_f.namelist()
+    else:
+        files = [
+            f for f in os.listdir(source) if os.path.isfile(os.path.join(source, f))
+        ]
+
+    for raw_filename in files:
+        logging.info("raw file name: %s" % raw_filename)  # noqa: UP031
+
+        # Get student name.
+        name = raw_filename.split("_")[0]
+
+        # Move file
+        try:
+            if zipfile.is_zipfile(source):
+                zip_f.extract(
+                    raw_filename,
+                    path=os.path.join(destination, name),
+                )
+            else:
+                os.rename(
+                    os.path.join(source, raw_filename),
+                    os.path.join(destination, name, raw_filename),
+                )
+        except OSError:
+            logging.error("oserror while operting on %s" % raw_filename)  # noqa: UP031
+
+    if zipfile.is_zipfile(source):
+        zip_f.close()
 
 
 @dataclass
