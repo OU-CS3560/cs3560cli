@@ -45,10 +45,20 @@ def check() -> None:
 @click.pass_context
 def check_github_username(ctx: click.Context, username: str) -> None:
     """
-    Check if a given GitHub's username exist or not.
+    Check if a given GitHub's USERNAME exist or not.
 
     This reduces the problem where student submit invalid username or when
     the metadata was recorded incorrectly.
+
+    1) Check a username.
+
+        \b
+        $ cs3560cli check githuh-username krerkkiat
+        
+    2) Check usernames in a file (one username on each line).
+
+        \b
+        $ cs3560cli check githuh-username @usernames.txt
     """
     if len(username) != 0 and username[0] == "@":
         filepath = Path(username[1:])
@@ -72,10 +82,20 @@ def check_github_username(ctx: click.Context, username: str) -> None:
 @click.pass_context
 def check_codewars_username(ctx: click.Context, username: str) -> None:
     """
-    Check if a given Codewars' username exist or not.
+    Check if a given Codewars' USERNAME exist or not.
 
     This reduces the problem where student submit invalid username or when
     the metadata was recorded incorrectly.
+
+    1) Check a username.
+
+        \b
+        $ cs3560cli check codewars-username krerkkiatc
+        
+    2) Check usernames in a file (one username on each line).
+
+        \b
+        $ cs3560cli check codewars-username @usernames.txt
     """
     if len(username) != 0 and username[0] == "@":
         filepath = Path(username[1:])

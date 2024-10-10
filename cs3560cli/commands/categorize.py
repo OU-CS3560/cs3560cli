@@ -26,7 +26,11 @@ def categorize(source: Path | str, destination: Path | str) -> None:
     """
     Group files from the same student together in a folder.
 
-    Note that this only work with files downloaded from Canvas.
+    SOURCE can be the zip file itself or the folder where the zip file
+    was extracted to. Note that this only work with files downloaded from Canvas.
+
+    DESTINATION is the folder where the grouped files to be in. If it does not
+    exist, one will be created.
 
     Example usages:
 
@@ -36,7 +40,15 @@ def categorize(source: Path | str, destination: Path | str) -> None:
         $ cs3560cli categorize submissions.zip hw2
         Categorizing files ...
         $ ls hw2/
-        kc555014 ... output is removed for brevity ...
+        bobcatrufus ... output is removed for brevity ...
+    
+    2) When the zip file was already extracted to 'hw2' folder.
+
+        \b
+        $ cs3560cli categorize hw2 hw2-grouped
+        Categorizing files ...
+        $ ls hw2-grouped/
+        bobcatrufus ... output is removed for brevity ...
     """
     click.echo("Categorizing files ...")
     categorize_step(source, destination)
