@@ -41,7 +41,7 @@ def categorize(source: Path | str, destination: Path | str) -> None:
         Categorizing files ...
         $ ls hw2/
         bobcatrufus ... output is removed for brevity ...
-    
+
     2) When the zip file was already extracted to 'hw2' folder.
 
         \b

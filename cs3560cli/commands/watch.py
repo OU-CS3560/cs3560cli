@@ -116,7 +116,7 @@ class ArchiveFilesEventHandler(PatternMatchingEventHandler):
 def watch(ctx: click.Context, path: Path) -> None:
     """
     Watch for a new zip file at PATH and extract it.
-    
+
     If PATH is not specified, assuming the current working directory.
     """
     if not is_7z_available():

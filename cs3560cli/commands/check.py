@@ -54,7 +54,7 @@ def check_github_username(ctx: click.Context, username: str) -> None:
 
         \b
         $ cs3560cli check githuh-username krerkkiat
-        
+
     2) Check usernames in a file (one username on each line).
 
         \b
@@ -91,7 +91,7 @@ def check_codewars_username(ctx: click.Context, username: str) -> None:
 
         \b
         $ cs3560cli check codewars-username krerkkiatc
-        
+
     2) Check usernames in a file (one username on each line).
 
         \b
