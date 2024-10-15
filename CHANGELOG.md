@@ -23,6 +23,7 @@ Note that the log for version before v0.2.1 may not be in the mentioned format.
 - [BREAKING CHANGE] Removal of `--with-token` flag since `auth` command is used to ask for and
   manage tokens.
 - [BREAKING CHANGE] Re-structure the commands.
+- Fix bug in `config.Config` where not all cases for `config_dir` were tested.
 
 ### Removed
 

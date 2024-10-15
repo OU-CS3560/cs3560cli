@@ -25,6 +25,8 @@ class Config:
                     self.config_dir = Path(user_config_home) / "cs3560cli"
         elif isinstance(config_dir, str):
             self.config_dir = Path(config_dir)
+        else:
+            self.config_dir = config_dir
 
         self.config_dir.mkdir(parents=True, exist_ok=True)
 
