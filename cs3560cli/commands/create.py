@@ -1,7 +1,9 @@
 """Create command groups."""
 
 import itertools
+import random
 import shutil
+import string
 import sys
 from pathlib import Path
 
@@ -184,6 +186,62 @@ def create_gitignore(
     with open(outfile, "w") as out_f:
         out_f.write(content)
     click.echo(f"Content is written to '{outfile!s}'")
+
+
+@create.command("password")
+@click.option(
+    "--style",
+    "-s",
+    type=click.Choice(("quiz", "ios")),
+    default="quiz",
+    help="Specify the style of password",
+)
+@click.option(
+    "--length",
+    type=int,
+    default=None,
+    help="Length of the password for the quiz style (default = 8). Length of the group in ios style (default = 6).",
+)
+@click.pass_context
+def create_password(
+    ctx: click.Context, style: str = "quiz", length: int | None = None
+) -> None:
+    """Create a random password with STYLE.
+
+    CAUTION: The generated password is not for security critical use case.
+    """
+
+    result = ""
+    if style == "quiz":
+        if length is None:
+            length = 8
+
+        digits = "".join(random.choices(string.digits, k=length))
+        indicies = random.choices(range(1, length-1), k =2)
+
+        result = ""
+        for idx, c in enumerate(digits):
+            if idx in indicies:
+                result = result + "-"
+            else:
+                result = result + c
+
+    elif style == "ios":
+        if length is None:
+            length = 6
+        groups = []
+        for _ in range(3):
+            groups.append(
+                "".join(
+                    random.choices(
+                        string.digits + string.ascii_lowercase + string.ascii_uppercase,
+                        k=length,
+                    )
+                )
+            )
+        result = "-".join(groups)
+
+    click.echo(result)
 
 
 @create.command(name="gh-invite")

@@ -16,6 +16,7 @@ Note that the log for version before v0.2.1 may not be in the mentioned format.
 - Add redis store interface (`store.BaseStore`, `store.RedisStore`).
 - Add `lms.canvas.categorize` function. `get_unique_names` was added to support it.
 - Add `create gh-team` command.
+- Add `create password` command that creates password with two styles: `quiz` and `ios`.
 
 ### Changed
 
