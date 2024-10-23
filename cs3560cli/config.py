@@ -3,7 +3,6 @@ Authentication context.
 """
 
 import os
-import sys
 from pathlib import Path
 
 import click
@@ -18,11 +17,12 @@ class Config:
 
         if config_dir is None:
             self.config_dir = Path.home() / ".config" / "cs3560cli"
+            user_config_home = os.environ.get("XDG_CONFIG_HOME", None)
 
-            if sys.platform == "linux":
-                user_config_home = os.environ.get("XDG_CONFIG_HOME", None)
-                if user_config_home is not None:
-                    self.config_dir = Path(user_config_home) / "cs3560cli"
+            if user_config_home is not None:
+                # If XDG_CONFIG_HOME is presence, we will obey it, but
+                # most likely only linux will have this variable.
+                self.config_dir = Path(user_config_home) / "cs3560cli"
         elif isinstance(config_dir, str):
             self.config_dir = Path(config_dir)
         else:

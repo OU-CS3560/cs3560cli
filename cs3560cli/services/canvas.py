@@ -12,6 +12,8 @@ from urllib.parse import urlparse
 
 import requests
 
+GRAPHQL_ENDPOINT = "https://ohio.instructure.com/api/graphql"
+
 
 def parse_url_for_course_id(url: str) -> str | None:
     """Parse Canvas' course URL for course ID."""
@@ -162,9 +164,20 @@ class Group:
     members: list[GroupMember]
 
 
+@dataclass
+class GroupSet:
+    name: str
+    groups: list[Group]
+
+
 class CanvasApi:
-    def __init__(self, token: str):
+    def __init__(self, token: str, graphql_endpoint: str | None = None):
         self._token = token
+
+        if graphql_endpoint is not None:
+            self.graphql_endpoint = graphql_endpoint
+        else:
+            self.graphql_endpoint = GRAPHQL_ENDPOINT
 
     def get_students(self, course_id: str) -> list[ty.Any] | None:
         """
@@ -193,7 +206,7 @@ class CanvasApi:
         }
         payload = {"query": query, "variables[courseId]": course_id}
         res = requests.post(
-            "https://ohio.instructure.com/api/graphql",
+            self.graphql_endpoint,
             headers=headers,
             data=payload,
         )
@@ -243,7 +256,7 @@ class CanvasApi:
         }
         payload = {"query": query, "variables[assignmentId]": assignment_id}
         res = requests.post(
-            "https://ohio.instructure.com/api/graphql",
+            self.graphql_endpoint,
             headers=headers,
             data=payload,
         )
@@ -265,9 +278,7 @@ class CanvasApi:
         else:
             return None
 
-    def get_groups_by_groupset_name(
-        self, course_id: str, groupset_name: str
-    ) -> list[Group] | None:
+    def get_groupsets(self, course_id: str) -> list[GroupSet] | None:
         query = """
             query ListGroupsInGroupSet($courseId: ID!) {
                 course(id: $courseId) {
@@ -299,30 +310,44 @@ class CanvasApi:
         }
         payload = {"query": query, "variables[courseId]": course_id}
         res = requests.post(
-            "https://ohio.instructure.com/api/graphql",
+            self.graphql_endpoint,
             headers=headers,
             data=payload,
         )
 
         if res.status_code == 200:
             response_data = res.json()
-            groupsets = response_data["data"]["course"]["groupSetsConnection"]["nodes"]
+            raw_groupsets = response_data["data"]["course"]["groupSetsConnection"][
+                "nodes"
+            ]
 
-            for groupset in groupsets:
-                if groupset["name"] == groupset_name:
-                    groups = []
-                    for raw_group in groupset["groupsConnection"]["nodes"]:
-                        members = []
-                        for raw_member in raw_group["membersConnection"]["nodes"]:
-                            members.append(
-                                GroupMember(
-                                    name=raw_member["user"]["name"],
-                                    email=raw_member["user"]["email"],
-                                )
+            groupsets = []
+            for groupset in raw_groupsets:
+                groups = []
+                for raw_group in groupset["groupsConnection"]["nodes"]:
+                    members = []
+                    for raw_member in raw_group["membersConnection"]["nodes"]:
+                        members.append(
+                            GroupMember(
+                                name=raw_member["user"]["name"],
+                                email=raw_member["user"]["email"],
                             )
-                        groups.append(Group(name=raw_group["name"], members=members))
-                    return groups
+                        )
+                    groups.append(Group(name=raw_group["name"], members=members))
+                groupsets.append(GroupSet(name=groupset["name"], groups=groups))
 
-            return None
+            return groupsets
         else:
             return None
+
+    def get_groups_by_groupset_name(
+        self, course_id: str, groupset_name: str
+    ) -> list[Group] | None:
+        groupsets = self.get_groupsets(course_id)
+        if groupsets is None:
+            return None
+
+        for groupset in groupsets:
+            if groupset.name == groupset_name:
+                return groupset.groups
+        return None

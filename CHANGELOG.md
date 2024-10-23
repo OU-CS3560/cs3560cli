@@ -17,6 +17,7 @@ Note that the log for version before v0.2.1 may not be in the mentioned format.
 - Add `lms.canvas.categorize` function. `get_unique_names` was added to support it.
 - Add `create gh-team` command.
 - Add `create password` command that creates password with two styles: `quiz` and `ios`.
+- Add `CanvasApi.get_groupsets`. `CanvasApi.get_groups_by_groupset_name` now use this internally.
 
 ### Changed
 

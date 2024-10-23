@@ -34,7 +34,7 @@ Run the test for various python's versions, run
 tox
 ```
 
-With test coverage
+With test coverage in py313 environment
 
 ```console
 pytest --cov=cs3560cli tests/

@@ -3,17 +3,19 @@ import pytest
 from cs3560cli.config import Config
 
 
-def test_config_home_from_env(monkeypatch: pytest.MonkeyPatch, tmp_path):
+def test_config_home_from_env(monkeypatch: pytest.MonkeyPatch, tmp_path) -> None:  # type: ignore[no-untyped-def]
     config_home = tmp_path / ".config"
     config_home.mkdir()
 
+    # This forces win32 and darwin to have XDG_CONFIG_HOME.
+    # which does not properly reflect the real-world condition.
     monkeypatch.setenv("XDG_CONFIG_HOME", str(config_home))
 
     _ = Config()
     assert (config_home / "cs3560cli" / "auth.yaml").exists()
 
 
-def test_config_home_arg(monkeypatch: pytest.MonkeyPatch, tmp_path):
+def test_config_home_arg(monkeypatch: pytest.MonkeyPatch, tmp_path) -> None:  # type: ignore[no-untyped-def]
     dir1 = tmp_path / "dir1"
     dir1.mkdir()
     _ = Config(config_dir=dir1)
@@ -25,7 +27,7 @@ def test_config_home_arg(monkeypatch: pytest.MonkeyPatch, tmp_path):
     assert (dir2 / "auth.yaml").exists()
 
 
-def test_config_default(monkeypatch: pytest.MonkeyPatch, tmp_path):
+def test_config_default(monkeypatch: pytest.MonkeyPatch, tmp_path) -> None:  # type: ignore[no-untyped-def]
     config_home = tmp_path / ".config"
     config_home.mkdir()
 
