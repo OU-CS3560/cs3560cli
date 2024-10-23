@@ -1,4 +1,4 @@
-"""Username Existance Checker.
+"""Username Existence Checker.
 
 Can be used to check if student's username exist on
 - gh: for GitHub profile page

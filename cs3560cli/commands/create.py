@@ -69,7 +69,7 @@ def build_gitignore_content(
     names = bases + [name for name in names if name.lower() not in bases]
 
     console = Console()
-    error_occured = False
+    error_occurred = False
     with console.status("[bold green]Fetching .gitignore content...") as status:
         for name in names:
             if name is None:
@@ -89,10 +89,10 @@ def build_gitignore_content(
                     console.log(
                         f"[red]Failed to fetch '{name}' (HTTP code: {res.status_code}). It will be skipped."
                     )
-                    error_occured = True
+                    error_occurred = True
             except requests.exceptions.RequestException as e:
                 raise ApiError("error occur when fetching content") from e
-    return final_text, error_occured
+    return final_text, error_occurred
 
 
 @create.command("gitignore")
@@ -132,7 +132,7 @@ def create_gitignore(
     The windows and macos content for .gitignore will be added by default. Use --base "" to disable this. The command will fetch the content
     from github/gitignore repository on GitHub using https://raw.githubusercontent.com/github/gitignore/main/.
 
-    --list-mapping can be used to view avaialble mapping. If the provided NAMES is not part of the mappings, it will be used as is.
+    --list-mapping can be used to view available mapping. If the provided NAMES is not part of the mappings, it will be used as is.
     """
     if list_mapping:
         click.echo("The following aliases are available:")
@@ -165,17 +165,17 @@ def create_gitignore(
     click.confirm("Do you want to continue?", default=True, abort=True)
 
     try:
-        content, error_occured = build_gitignore_content(names, bases)
-        if error_occured:
+        content, error_occurred = build_gitignore_content(names, bases)
+        if error_occurred:
             click.confirm(
                 "One or more name failed to fetch. Do you want to continue?",
                 default=False,
                 abort=True,
             )
     except ConnectionError as e:
-        ctx.fail(f"network error occured\n{e}")
+        ctx.fail(f"network error occurred\n{e}")
     except ApiError as e:
-        ctx.fail(f"api error occured\n{e}")
+        ctx.fail(f"api error occurred\n{e}")
 
     if outfile.exists():
         ans = click.confirm(f"'{outfile!s}' already exist, overwrite?")
@@ -217,11 +217,11 @@ def create_password(
             length = 8
 
         digits = "".join(random.choices(string.digits, k=length))
-        indicies = random.choices(range(1, length-1), k =2)
+        indices = random.choices(range(1, length - 1), k=2)
 
         result = ""
         for idx, c in enumerate(digits):
-            if idx in indicies:
+            if idx in indices:
                 result = result + "-"
             else:
                 result = result + c
@@ -263,7 +263,7 @@ def create_password(
 )
 @pass_config
 @click.pass_context
-def craete_github_invite(
+def create_github_invite(
     ctx: click.Context,
     config: Config,
     team_path: str,
@@ -335,7 +335,7 @@ def craete_github_invite(
         canvas = CanvasApi(token=config.canvas_token)
         students = canvas.get_students(course_id)
         if students is None:
-            print("[red]Cannot retrive student list from Canvas.")
+            print("[red]Cannot retrieve student list from Canvas.")
             ctx.exit(1)
 
         email_addresses = [s["user"]["email"] for s in students]
@@ -435,7 +435,7 @@ def craete_github_invite(
 )
 @pass_config
 @click.pass_context
-def craete_github_team(
+def create_github_team(
     ctx: click.Context,
     config: Config,
     team_path: str,
@@ -494,7 +494,7 @@ def craete_github_team(
         if not config.has_canvas_token():
             ctx.invoke(update_canvas_token)
 
-        # TODO: Obtain list of groups from groupset.
+        # TODO: Obtain list of groups from groupset on Canvas.
         # The creation flow need to be adjusted to create multiple
         # teams.
 
@@ -537,7 +537,7 @@ def craete_github_team(
                 click.echo("[error]: failed to add team to the repository.")
                 ctx.exit(1)
 
-        # TODO: If invite is presense, invite to the team.
+        # TODO: If invite is presence, parse and invite to the team.
 
     except PermissionError:
         print(

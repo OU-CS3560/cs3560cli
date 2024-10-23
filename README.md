@@ -14,7 +14,7 @@ python -m pip install cs3560cli
 - `create gh-invite` : Invite students to a team in GitHub organization using data from Canvas.
 - `create gitignore` : Create an opinionated `.gitignore` file where `macOS.gitignore` and `Windows.gitignore` are included by default.
 - `watch` : Watch for (and extract) the zip file.
-- `highlight` : Create HTML fragments of a syntax highlighted snippet of code that can then be embeded in LMS. For an image of the source code, you may want to use [Charm's freeze](https://github.com/charmbracelet/freeze) instead.
+- `highlight` : Create HTML fragments of a syntax highlighted snippet of code that can then be embedded in LMS. For an image of the source code, you may want to use [Charm's freeze](https://github.com/charmbracelet/freeze) instead.
 - `check github-username` : Check if the GitHub or Codewars username the student provided actually exist or not.
 
 ## Examples

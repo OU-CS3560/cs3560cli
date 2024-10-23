@@ -77,7 +77,7 @@ class GitHubApi:
             return data["id"]
         elif res.status_code == 401 or res.status_code == 403:
             raise PermissionError(
-                "Does not have enough permission to retrive the team's id."
+                "Does not have enough permission to retrieve the team's id."
             )
         elif res.status_code == 404:
             return None

@@ -42,7 +42,7 @@ def import_students(
     canvas = CanvasApi(token=config.canvas_token)
     students = canvas.get_students(canvas_course_id)
     if students is None:
-        click.echo("[error]: Cannot retrive student list from Canvas.")
+        click.echo("[error]: Cannot retrieve student list from Canvas.")
         ctx.exit(1)
 
     email_addresses = [s["user"]["email"] for s in students]

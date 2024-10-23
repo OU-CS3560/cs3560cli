@@ -33,7 +33,7 @@ def get_unique_names(path: Path | str) -> list[str]:
     """
     Return unique email handle in folder of submitted files.
 
-    :param path: A path to folder containing files extracted from downlaoded zip file.
+    :param path: A path to folder containing files extracted from downloaded zip file.
     :type path: str, pathlib.Path
     :return: List of unique names.
     :rtype: list[str]
@@ -135,7 +135,7 @@ def categorize(source: Path | str, destination: Path | str) -> None:
                     os.path.join(destination, name, raw_filename),
                 )
         except OSError:
-            logging.error("oserror while operting on %s" % raw_filename)  # noqa: UP031
+            logging.error("oserror while operating on %s" % raw_filename)  # noqa: UP031
 
     if zipfile.is_zipfile(source):
         zip_f.close()
@@ -168,7 +168,7 @@ class CanvasApi:
 
     def get_students(self, course_id: str) -> list[ty.Any] | None:
         """
-        Retrive students in the course.
+        Retrieve students in the course.
         """
         query = """
             query ListStudents($courseId: ID!) {
