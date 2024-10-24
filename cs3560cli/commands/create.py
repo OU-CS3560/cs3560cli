@@ -338,7 +338,7 @@ def create_github_invite(
             print("[red]Cannot retrieve student list from Canvas.")
             ctx.exit(1)
 
-        email_addresses = [s["user"]["email"] for s in students]
+        email_addresses = [s.email_address for s in students]
         click.echo(f"Found {len(email_addresses)} students in course id={course_id}.")
 
     elif from_file is not None:

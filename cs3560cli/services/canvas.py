@@ -143,13 +143,86 @@ def categorize(source: Path | str, destination: Path | str) -> None:
         zip_f.close()
 
 
+T = ty.TypeVar("T")
+
+
+@dataclass
+class User:
+    id: str
+    name: str
+    email_address: str
+    role: str
+
+    @classmethod
+    def from_graphql_node(cls: type[T], node: dict[str, ty.Any]) -> T:
+        return cls(
+            id=node["user"]["_id"],
+            name=node["user"]["name"],
+            email_address=node["user"]["email"],
+            role=node["sisRole"],
+        )
+
+    @classmethod
+    def from_graphql_nodes(cls: type[T], nodes: list[dict[str, ty.Any]]) -> list[T]:
+        return [cls.from_graphql_node(node) for node in nodes]
+
+
+@dataclass
+class Assignment:
+    id: str
+    name: str
+
+    @classmethod
+    def from_graphql_node(cls: type[T], node: dict[str, ty.Any]) -> T:
+        return cls(id=node["_id"], name=node["name"])
+
+    @classmethod
+    def from_graphql_nodes(cls: type[T], nodes: list[dict[str, ty.Any]]) -> list[T]:
+        return [cls.from_graphql_node(node) for node in nodes]
+
+
+@dataclass
+class Comment:
+    id: str
+    author_email: str
+    comment: str
+
+    @classmethod
+    def from_graphql_node(cls: type[T], node: dict[str, ty.Any]) -> T:
+        return cls(
+            id=node["_id"],
+            author_email=node["author"]["email"],
+            comment=node["comment"],
+        )
+
+    @classmethod
+    def from_graphql_nodes(cls: type[T], nodes: list[dict[str, ty.Any]]) -> list[T]:
+        return [cls.from_graphql_node(node) for node in nodes]
+
+
 @dataclass
 class Submission:
     """Represent parsed submission data from Canvas."""
 
+    id: str
     email: str
     submissionStatus: str
     url: str  # When the submission type is a website URL.
+    comments: list[Comment]
+
+    @classmethod
+    def from_graphql_node(cls: type[T], node: dict[str, ty.Any]) -> T:
+        return cls(
+            id=node["_id"],
+            email=node["user"]["email"],
+            submissionStatus=node["submissionStatus"],
+            url=node["url"],
+            comments=Comment.from_graphql_nodes(node["commentsConnection"]["nodes"]),
+        )
+
+    @classmethod
+    def from_graphql_nodes(cls: type[T], nodes: list[dict[str, ty.Any]]) -> list[T]:
+        return [cls.from_graphql_node(node) for node in nodes]
 
 
 @dataclass
@@ -157,11 +230,30 @@ class GroupMember:
     name: str
     email: str
 
+    @classmethod
+    def from_graphql_node(cls: type[T], node: dict[str, ty.Any]) -> T:
+        return cls(name=node["user"]["name"], email=node["user"]["email"])
+
+    @classmethod
+    def from_graphql_nodes(cls: type[T], nodes: list[dict[str, ty.Any]]) -> list[T]:
+        return [cls.from_graphql_node(node) for node in nodes]
+
 
 @dataclass
 class Group:
     name: str
     members: list[GroupMember]
+
+    @classmethod
+    def from_graphql_node(cls: type[T], node: dict[str, ty.Any]) -> T:
+        return cls(
+            name=node["name"],
+            members=GroupMember.from_graphql_nodes(node["membersConnection"]["nodes"]),
+        )
+
+    @classmethod
+    def from_graphql_nodes(cls: type[T], nodes: list[dict[str, ty.Any]]) -> list[T]:
+        return [cls.from_graphql_node(node) for node in nodes]
 
 
 @dataclass
@@ -169,8 +261,21 @@ class GroupSet:
     name: str
     groups: list[Group]
 
+    @classmethod
+    def from_graphql_node(cls: type[T], node: dict[str, ty.Any]) -> T:
+        return cls(
+            name=node["name"],
+            groups=Group.from_graphql_nodes(node["groupsConnection"]["nodes"]),
+        )
+
+    @classmethod
+    def from_graphql_nodes(cls: type[T], nodes: list[dict[str, ty.Any]]) -> list[T]:
+        return [cls.from_graphql_node(node) for node in nodes]
+
 
 class CanvasApi:
+    """Abstraction layer of various Graphql queries."""
+
     def __init__(self, token: str, graphql_endpoint: str | None = None):
         self._token = token
 
@@ -179,17 +284,39 @@ class CanvasApi:
         else:
             self.graphql_endpoint = GRAPHQL_ENDPOINT
 
-    def get_students(self, course_id: str) -> list[ty.Any] | None:
+    def _send_request(
+        self, payload: dict[str, ty.Any], method: str = "POST"
+    ) -> dict[str, ty.Any] | None:
+        """Send a request to the endpoint."""
+        headers = {
+            "User-Agent": "cs3560cli",
+            "Authorization": f"Bearer {self._token}",
+            "Accept": "application/json",
+        }
+        res = requests.request(
+            method,
+            self.graphql_endpoint,
+            headers=headers,
+            data=payload,
+        )
+
+        if res.status_code == requests.codes.OKAY:
+            return res.json()  # type: ignore[no-any-return]
+        else:
+            return None
+
+    def get_users(self, course_id: str) -> list[ty.Any] | None:
         """
-        Retrieve students in the course.
+        Retrieve all users in the course.
         """
         query = """
-            query ListStudents($courseId: ID!) {
+            query ListUsers($courseId: ID!) {
                 course(id: $courseId) {
-                    id
+                    _id
                     enrollmentsConnection {
                         nodes {
                             user {
+                                _id
                                 email
                                 name
                             }
@@ -199,31 +326,28 @@ class CanvasApi:
                 }
             }
         """
-        headers = {
-            "User-Agent": "cs3560cli",
-            "Authorization": f"Bearer {self._token}",
-            "Accept": "application/json",
-        }
-        payload = {"query": query, "variables[courseId]": course_id}
-        res = requests.post(
-            self.graphql_endpoint,
-            headers=headers,
-            data=payload,
+        response_data = self._send_request(
+            {"query": query, "variables[courseId]": course_id}, method="POST"
         )
 
-        if res.status_code == 200:
-            response_data = res.json()
-            course_members = response_data["data"]["course"]["enrollmentsConnection"][
-                "nodes"
-            ]
+        if response_data is not None:
+            return User.from_graphql_nodes(
+                response_data["data"]["course"]["enrollmentsConnection"]["nodes"]
+            )
+        else:
+            return None
+
+    def get_students(self, course_id: str) -> list[ty.Any] | None:
+        """
+        Retrieve all students in the course.
+        """
+        users = self.get_users(course_id)
+        if users is not None:
             students = []
-            for member in course_members:
+            for user in users:
                 # There is a "Test Student" that has no value in the email field.
-                if (
-                    member["sisRole"] == "student"
-                    and member["user"]["email"] is not None
-                ):
-                    students.append(member)
+                if user.role == "student" and user.email_address is not None:
+                    students.append(user)
             return students
         else:
             return None
@@ -238,10 +362,20 @@ class CanvasApi:
                 assignment(id: $assignmentId) {
                     submissionsConnection {
                         nodes {
+                            _id
                             submissionStatus
                             url
                             user {
                                 email
+                            }
+                            commentsConnection {
+                                nodes {
+                                    _id
+                                    comment
+                                    author {
+                                        email
+                                    }
+                                }
                             }
                         }
                     }
@@ -249,36 +383,19 @@ class CanvasApi:
                 }
             }
         """
-        headers = {
-            "User-Agent": "cs3560cli",
-            "Authorization": f"Bearer {self._token}",
-            "Accept": "application/json",
-        }
-        payload = {"query": query, "variables[assignmentId]": assignment_id}
-        res = requests.post(
-            self.graphql_endpoint,
-            headers=headers,
-            data=payload,
+        response_data = self._send_request(
+            {"query": query, "variables[assignmentId]": assignment_id}, method="POST"
         )
 
-        if res.status_code == 200:
-            response_data = res.json()
-            raw_submissions = response_data["data"]["assignment"][
-                "submissionsConnection"
-            ]["nodes"]
-            submissions = []
-            for data in raw_submissions:
-                submission = Submission(
-                    email=data["user"]["email"],
-                    submissionStatus=data["submissionStatus"],
-                    url=data["url"],
-                )
-                submissions.append(submission)
-            return submissions
+        if response_data is not None:
+            return Submission.from_graphql_nodes(
+                response_data["data"]["assignment"]["submissionsConnection"]["nodes"]
+            )
         else:
             return None
 
     def get_groupsets(self, course_id: str) -> list[GroupSet] | None:
+        """Query tne GraphQL endpoint for groupsets in the course."""
         query = """
             query ListGroupsInGroupSet($courseId: ID!) {
                 course(id: $courseId) {
@@ -303,40 +420,13 @@ class CanvasApi:
                 }
             }
         """
-        headers = {
-            "User-Agent": "cs3560cli",
-            "Authorization": f"Bearer {self._token}",
-            "Accept": "application/json",
-        }
-        payload = {"query": query, "variables[courseId]": course_id}
-        res = requests.post(
-            self.graphql_endpoint,
-            headers=headers,
-            data=payload,
+        response_data = self._send_request(
+            {"query": query, "variables[courseId]": course_id}, method="POST"
         )
-
-        if res.status_code == 200:
-            response_data = res.json()
-            raw_groupsets = response_data["data"]["course"]["groupSetsConnection"][
-                "nodes"
-            ]
-
-            groupsets = []
-            for groupset in raw_groupsets:
-                groups = []
-                for raw_group in groupset["groupsConnection"]["nodes"]:
-                    members = []
-                    for raw_member in raw_group["membersConnection"]["nodes"]:
-                        members.append(
-                            GroupMember(
-                                name=raw_member["user"]["name"],
-                                email=raw_member["user"]["email"],
-                            )
-                        )
-                    groups.append(Group(name=raw_group["name"], members=members))
-                groupsets.append(GroupSet(name=groupset["name"], groups=groups))
-
-            return groupsets
+        if response_data is not None:
+            return GroupSet.from_graphql_nodes(
+                response_data["data"]["course"]["groupSetsConnection"]["nodes"]
+            )
         else:
             return None
 
@@ -351,3 +441,27 @@ class CanvasApi:
             if groupset.name == groupset_name:
                 return groupset.groups
         return None
+
+    def get_assignments(self, course_id: str) -> list[Assignment] | None:
+        query = """
+            query ListAssignments($courseId: ID!) {
+                course(id: $courseId) {
+                    id
+                    assignmentsConnection {
+                        nodes {
+                            _id
+                            name
+                        }
+                    }
+                }
+            }
+        """
+        response_data = self._send_request(
+            {"query": query, "variables[courseId]": course_id}, method="POST"
+        )
+        if response_data is not None:
+            return Assignment.from_graphql_nodes(
+                response_data["data"]["course"]["assignmentsConnection"]["nodes"]
+            )
+        else:
+            return None
