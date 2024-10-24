@@ -5,6 +5,8 @@ from cs3560cli.main import cli
 from cs3560cli.services.canvas import CanvasApi, User
 from cs3560cli.services.github import GitHubApi
 
+from .fixtures import config_home_with_fake_tokens  # noqa: F401
+
 
 @pytest.mark.skip(reason="live data")
 def test_create_gitignore_command(config_home_with_fake_tokens):

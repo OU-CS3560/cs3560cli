@@ -1,13 +1,13 @@
-
 import pytest
 import requests
-from common import (
+
+from cs3560cli.services.canvas import CanvasApi, parse_url_for_course_id
+
+from .mocks import (
     MockSuccessfulGroupSetResponse,
     MockSuccessfulListSubmissionsResponse,
     MockSuccessfulListUsersResponse,
 )
-
-from cs3560cli.services.canvas import CanvasApi, parse_url_for_course_id
 
 
 def test_parse_url_for_course_id() -> None:
@@ -75,4 +75,5 @@ def test_get_groups_by_groupset_name(monkeypatch: pytest.MonkeyPatch) -> None:
     assert groups is not None
     assert len(groups) == 2
     groups = client.get_groups_by_groupset_name("0", "Homework 1")
+    assert groups is None
     assert groups is None

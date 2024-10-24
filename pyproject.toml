@@ -79,7 +79,10 @@ ignore = [
 
 [tool.ruff.lint.isort]
 # So the imports in tests/ still sort the same way.
-known-first-party = ["cs3560cli"] 
+known-first-party = ["cs3560cli"]
+
+[tool.ruff.lint.extend-per-file-ignores]
+"tests/**/test_*.py" = ["F811"]
 
 [tool.mypy]
 files = ["cs3560cli", "tests"]
