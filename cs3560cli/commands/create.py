@@ -57,7 +57,7 @@ def build_gitignore_content(
     names: list[str],
     bases: list[str] | None = None,
     root: str = "https://raw.githubusercontent.com/github/gitignore/main/",
-    header_text_template: str = "#\n# {path}\n# Get the latest version at https://github.com/github/gitignore/{path}\n#\n",
+    header_text_template: str = "#\n# {path}\n# Get the latest version at https://github.com/github/gitignore/tree/main/{path}\n#\n",
 ) -> tuple[str, bool]:
     """Create .gitignore content from list of names and bases."""
     if bases is None:
