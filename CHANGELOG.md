@@ -4,14 +4,17 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://packaging.python.org/en/latest/discussions/versioning/).
+However, any version below 1.0.0 is considered unstable and API breaking changes may occur in any version.
 
 Note that the log for version before v0.2.1 may not be in the mentioned format.
 
 ## [Unreleased]
 
+## v0.4.0 - 2024-11-14
+
 ### Added
 
-- Add `students` command.
+- Add `db` command and its subcommands.
 - Add tokens store via `cs3560cli.config`.
 - Add redis store interface (`store.BaseStore`, `store.RedisStore`).
 - Add `lms.canvas.categorize` function. `get_unique_names` was added to support it.
