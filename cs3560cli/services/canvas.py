@@ -4,13 +4,13 @@ Collection of functions for Canvas LMS.
 
 import logging
 import os
-import typing as ty
 import zipfile
 from dataclasses import dataclass
 from pathlib import Path
 from urllib.parse import urlparse
 
 import requests
+import typing_extensions as ty
 
 GRAPHQL_ENDPOINT = "https://ohio.instructure.com/api/graphql"
 
@@ -154,7 +154,7 @@ class User:
     role: str
 
     @classmethod
-    def from_graphql_node(cls: type[T], node: dict[str, ty.Any]) -> T:
+    def from_graphql_node(cls, node: dict[str, ty.Any]) -> ty.Self:
         return cls(
             id=node["user"]["_id"],
             name=node["user"]["name"],
@@ -163,7 +163,7 @@ class User:
         )
 
     @classmethod
-    def from_graphql_nodes(cls: type[T], nodes: list[dict[str, ty.Any]]) -> list[T]:
+    def from_graphql_nodes(cls, nodes: list[dict[str, ty.Any]]) -> list[ty.Self]:
         return [cls.from_graphql_node(node) for node in nodes]
 
 
@@ -173,11 +173,11 @@ class Assignment:
     name: str
 
     @classmethod
-    def from_graphql_node(cls: type[T], node: dict[str, ty.Any]) -> T:
+    def from_graphql_node(cls, node: dict[str, ty.Any]) -> ty.Self:
         return cls(id=node["_id"], name=node["name"])
 
     @classmethod
-    def from_graphql_nodes(cls: type[T], nodes: list[dict[str, ty.Any]]) -> list[T]:
+    def from_graphql_nodes(cls, nodes: list[dict[str, ty.Any]]) -> list[ty.Self]:
         return [cls.from_graphql_node(node) for node in nodes]
 
 
@@ -188,7 +188,7 @@ class Comment:
     comment: str
 
     @classmethod
-    def from_graphql_node(cls: type[T], node: dict[str, ty.Any]) -> T:
+    def from_graphql_node(cls, node: dict[str, ty.Any]) -> ty.Self:
         return cls(
             id=node["_id"],
             author_email=node["author"]["email"],
@@ -196,7 +196,7 @@ class Comment:
         )
 
     @classmethod
-    def from_graphql_nodes(cls: type[T], nodes: list[dict[str, ty.Any]]) -> list[T]:
+    def from_graphql_nodes(cls, nodes: list[dict[str, ty.Any]]) -> list[ty.Self]:
         return [cls.from_graphql_node(node) for node in nodes]
 
 
@@ -211,7 +211,7 @@ class Submission:
     comments: list[Comment]
 
     @classmethod
-    def from_graphql_node(cls: type[T], node: dict[str, ty.Any]) -> T:
+    def from_graphql_node(cls, node: dict[str, ty.Any]) -> ty.Self:
         return cls(
             id=node["_id"],
             email=node["user"]["email"],
@@ -221,7 +221,7 @@ class Submission:
         )
 
     @classmethod
-    def from_graphql_nodes(cls: type[T], nodes: list[dict[str, ty.Any]]) -> list[T]:
+    def from_graphql_nodes(cls, nodes: list[dict[str, ty.Any]]) -> list[ty.Self]:
         return [cls.from_graphql_node(node) for node in nodes]
 
 
@@ -231,11 +231,11 @@ class GroupMember:
     email: str
 
     @classmethod
-    def from_graphql_node(cls: type[T], node: dict[str, ty.Any]) -> T:
+    def from_graphql_node(cls, node: dict[str, ty.Any]) -> ty.Self:
         return cls(name=node["user"]["name"], email=node["user"]["email"])
 
     @classmethod
-    def from_graphql_nodes(cls: type[T], nodes: list[dict[str, ty.Any]]) -> list[T]:
+    def from_graphql_nodes(cls, nodes: list[dict[str, ty.Any]]) -> list[ty.Self]:
         return [cls.from_graphql_node(node) for node in nodes]
 
 
@@ -245,14 +245,14 @@ class Group:
     members: list[GroupMember]
 
     @classmethod
-    def from_graphql_node(cls: type[T], node: dict[str, ty.Any]) -> T:
+    def from_graphql_node(cls, node: dict[str, ty.Any]) -> ty.Self:
         return cls(
             name=node["name"],
             members=GroupMember.from_graphql_nodes(node["membersConnection"]["nodes"]),
         )
 
     @classmethod
-    def from_graphql_nodes(cls: type[T], nodes: list[dict[str, ty.Any]]) -> list[T]:
+    def from_graphql_nodes(cls, nodes: list[dict[str, ty.Any]]) -> list[ty.Self]:
         return [cls.from_graphql_node(node) for node in nodes]
 
 
@@ -262,14 +262,14 @@ class GroupSet:
     groups: list[Group]
 
     @classmethod
-    def from_graphql_node(cls: type[T], node: dict[str, ty.Any]) -> T:
+    def from_graphql_node(cls, node: dict[str, ty.Any]) -> ty.Self:
         return cls(
             name=node["name"],
             groups=Group.from_graphql_nodes(node["groupsConnection"]["nodes"]),
         )
 
     @classmethod
-    def from_graphql_nodes(cls: type[T], nodes: list[dict[str, ty.Any]]) -> list[T]:
+    def from_graphql_nodes(cls, nodes: list[dict[str, ty.Any]]) -> list[ty.Self]:
         return [cls.from_graphql_node(node) for node in nodes]
 
 
@@ -305,7 +305,7 @@ class CanvasApi:
         else:
             return None
 
-    def get_users(self, course_id: str) -> list[ty.Any] | None:
+    def get_users(self, course_id: str) -> list[User] | None:
         """
         Retrieve all users in the course.
         """
@@ -337,7 +337,7 @@ class CanvasApi:
         else:
             return None
 
-    def get_students(self, course_id: str) -> list[ty.Any] | None:
+    def get_students(self, course_id: str) -> list[User] | None:
         """
         Retrieve all students in the course.
         """

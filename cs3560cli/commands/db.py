@@ -1,4 +1,7 @@
-"""Students related commands."""
+"""Commands for managing a data store for the course.
+
+- Associate student's email handle with github username.
+"""
 
 import shutil
 
@@ -14,12 +17,12 @@ from .auth import update_canvas_token, update_redis_uri
 @click.group(
     context_settings={"max_content_width": shutil.get_terminal_size().columns - 10}
 )
-def students() -> None:
+def db() -> None:
     """Students management commands."""
     pass
 
 
-@students.command(name="import")
+@db.command(name="import")
 @click.argument("canvas_course_id", type=str)
 @click.argument("course_name", type=str)
 @click.option("--force", "-f", type=bool, default=False, is_flag=True)
@@ -45,7 +48,7 @@ def import_students(
         click.echo("[error]: Cannot retrieve student list from Canvas.")
         ctx.exit(1)
 
-    email_addresses = [s["user"]["email"] for s in students]
+    email_addresses = [s.email_address for s in students]
     click.echo(
         f"Found {len(email_addresses)} students in course id={canvas_course_id}."
     )
@@ -63,7 +66,7 @@ def import_students(
             )
 
 
-@students.command(name="list-github-usernames")
+@db.command(name="list-github-usernames")
 @click.argument("course_name")
 @pass_config
 @click.pass_context
@@ -83,7 +86,7 @@ def list_github_usernames(
             print(f"{email_handle}:{github_username}")
 
 
-@students.command(name="set-github-username")
+@db.command(name="set-github-username")
 @click.argument("email_handle")
 @click.argument("github_username")
 @click.option("--force", "-f", type=bool, default=False, is_flag=True)

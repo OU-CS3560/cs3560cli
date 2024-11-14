@@ -1,11 +1,10 @@
-
 import pytest
 
 from cs3560cli.config import Config
 
 
 @pytest.fixture
-def config_home_with_fake_tokens(tmp_path):
+def config_home_with_fake_tokens(tmp_path):  # type: ignore[no-untyped-def]
     config_home = tmp_path / ".config"
     config_home.mkdir()
 

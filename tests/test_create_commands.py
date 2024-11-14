@@ -1,3 +1,5 @@
+from pathlib import Path
+
 import pytest
 from click.testing import CliRunner
 
@@ -9,7 +11,7 @@ from .fixtures import config_home_with_fake_tokens  # noqa: F401
 
 
 @pytest.mark.skip(reason="live data")
-def test_create_gitignore_command(config_home_with_fake_tokens):
+def test_create_gitignore_command(config_home_with_fake_tokens: Path) -> None:
     runner = CliRunner(env={"XDG_CONFIG_HOME": str(config_home_with_fake_tokens)})
     with runner.isolated_filesystem():
         result = runner.invoke(
@@ -29,7 +31,9 @@ def test_create_gitignore_command(config_home_with_fake_tokens):
 
 
 @pytest.mark.parametrize("style_val", ["quiz", "ios"])
-def test_create_password_command(style_val, config_home_with_fake_tokens):
+def test_create_password_command(
+    style_val: str, config_home_with_fake_tokens: Path
+) -> None:
     runner = CliRunner(env={"XDG_CONFIG_HOME": str(config_home_with_fake_tokens)})
     with runner.isolated_filesystem():
         result = runner.invoke(
@@ -51,7 +55,9 @@ def test_create_password_command(style_val, config_home_with_fake_tokens):
     "course_id_val", ["0", "https://ohio.instructure.com/courses/0/"]
 )
 def test_create_github_invite_command(
-    course_id_val: str, monkeypatch: pytest.MonkeyPatch, config_home_with_fake_tokens
+    course_id_val: str,
+    monkeypatch: pytest.MonkeyPatch,
+    config_home_with_fake_tokens: Path,
 ) -> None:
     def mock_get_students(*args, **kwargs):  # type: ignore[no-untyped-def]
         return [User("0", "Rufus Bobcat", "br000001@ohio.edu", "student")]
@@ -84,7 +90,8 @@ def test_create_github_invite_command(
 
 
 def test_create_github_invite_command_invalid_team_name(
-    monkeypatch: pytest.MonkeyPatch, config_home_with_fake_tokens
+    monkeypatch: pytest.MonkeyPatch,
+    config_home_with_fake_tokens: Path,
 ) -> None:
     def mock_get_students(*args, **kwargs):  # type: ignore[no-untyped-def]
         return [User("0", "Rufus Bobcat", "br000001@ohio.edu", "student")]

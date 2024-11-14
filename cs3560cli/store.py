@@ -1,5 +1,5 @@
 """
-Data store for students commands.
+Data store for the sub-commands in db command.
 
 Key formats:
 

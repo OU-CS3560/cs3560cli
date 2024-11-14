@@ -7,9 +7,9 @@ from .commands.auth import auth
 from .commands.categorize import categorize
 from .commands.check import check
 from .commands.create import create
+from .commands.db import db
 from .commands.get import get
 from .commands.highlight import highlight
-from .commands.students import students
 from .commands.watch import watch
 from .config import Config
 
@@ -33,7 +33,7 @@ cli.add_command(create)
 cli.add_command(get)
 cli.add_command(highlight)
 cli.add_command(watch)
-cli.add_command(students)
+cli.add_command(db)
 
 
 @cli.command(name="help")
