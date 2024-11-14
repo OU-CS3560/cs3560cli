@@ -10,6 +10,8 @@ import time
 from pathlib import Path
 
 import click
+from rich import print
+from rich.console import Console
 from watchdog.events import (
     DirCreatedEvent,
     DirMovedEvent,
@@ -22,6 +24,13 @@ from watchdog.observers import Observer
 from watchdog.utils import platform
 
 WIN_KNOWN_7Z_PATH = Path(r"C:\Program Files\7-Zip\7z.exe")
+
+
+def to_path(text: str | bytes) -> Path:
+    if isinstance(text, bytes):
+        return Path(text.decode())
+    else:
+        return Path(text)
 
 
 def is_7z_available() -> bool:
@@ -45,30 +54,63 @@ def is_7z_available() -> bool:
     return False
 
 
-def extract(path: Path) -> None:
+def extract(path: Path, console: Console | None = None) -> None:
     dir_name = path.stem
     dir_path = path.with_name(dir_name)
 
     if dir_path.exists() and dir_path.is_dir():
-        print(
-            f"[warn] target folder ({dir_path!s}) already exist, skipping the extraction"
-        )
+        if console is not None:
+            console.warn(
+                f"[bold yellow]target folder ({dir_path!s}) already exist, skipping the extraction[/bold yellow]"
+            )
+        else:
+            print(
+                f"[bold yellow]target folder ({dir_path!s}) already exist, skipping the extraction[/bold yellow]"
+            )
         return
 
     if platform.is_linux():
         # FIXME: The 7z will flatten the directory tree.
-        subprocess.check_output(args=["7z", "x", path, f"-o{dir_path!s}"])
+        try:
+            subprocess.check_output(args=["7z", "x", path, f"-o{dir_path!s}"])
+        except subprocess.CalledProcessError:
+            if console is not None:
+                console.warn(
+                    f"[bold red]failed to extract file: {path!s} to {dir_path!s}[/bold red]"
+                )
+            else:
+                print(
+                    f"[bold red]failed to extract file: {path!s} to {dir_path!s}[/bold red]"
+                )
     elif platform.is_windows():
-        subprocess.check_output(
-            args=[str(WIN_KNOWN_7Z_PATH), "x", path, f"-o{dir_path!s}"]
-        )
+        try:
+            subprocess.check_output(
+                args=[str(WIN_KNOWN_7Z_PATH), "x", path, f"-o{dir_path!s}"]
+            )
+        except subprocess.CalledProcessError:
+            if console is not None:
+                console.warn(
+                    f"[bold red]failed to extract file: {path!s} to {dir_path!s}[/bold red]"
+                )
+            else:
+                print(
+                    f"[bold red]failed to extract file: {path!s} to {dir_path!s}[/bold red]"
+                )
 
 
 class ArchiveFilesEventHandler(PatternMatchingEventHandler):
-    def __init__(self) -> None:
-        super().__init__(
-            patterns=["*.7z", "*.zip", "*.tar", "*.tar.gz", "*.tar.xz", "*.rar"]
-        )
+    def __init__(self, console: Console) -> None:
+        self.archive_suffixes = [
+            ".7z",
+            ".zip",
+            ".tar",
+            ".tar.gz",
+            ".tar.xz",
+            ".rar",
+        ]
+        super().__init__(patterns=[f"*{name}" for name in self.archive_suffixes])
+
+        self.console = console
 
     def on_created(self, event: DirCreatedEvent | FileCreatedEvent) -> None:
         """
@@ -76,11 +118,10 @@ class ArchiveFilesEventHandler(PatternMatchingEventHandler):
         to do the actual extraction.
         """
         if event.is_directory is False:
-            if isinstance(event.src_path, bytes):
-                path = Path(event.src_path.decode())
-            else:
-                path = Path(event.src_path)
-            print(f"detected (on created event) {path!s}")
+            src_path = to_path(event.src_path)
+            self.console.log(f"on_created(file, src_path={src_path!s})")
+        else:
+            self.console.log(f"on_created(folder, src_path={src_path!s})")
 
     def on_closed(self, event: FileClosedEvent) -> None:
         if event.is_directory is False:
@@ -88,26 +129,30 @@ class ArchiveFilesEventHandler(PatternMatchingEventHandler):
             # The file will still be closing and we will get an error when we try to open
             # the target file.
             time.sleep(2)
-            if isinstance(event.src_path, bytes):
-                path = Path(event.src_path.decode())
-            else:
-                path = Path(event.src_path)
-            print(f"extracting (on closed event after delayed) {path!s}")
+            src_path = to_path(event.src_path)
+            self.console.log(f"delayed on_closed(file, src_path={src_path!s})")
 
             # We can also be the one closing the file.
-            extract(path)
+            extract(src_path)
 
     def on_moved(self, event: DirMovedEvent | FileMovedEvent) -> None:
         """
         Chromium-based browsers move the file from `*.crdownload` to the actual file name.
         """
+        src_path = to_path(event.src_path)
+        dest_path = to_path(event.dest_path)
         if event.is_directory is False:
-            if isinstance(event.src_path, bytes):
-                path = Path(event.src_path.decode())
-            else:
-                path = Path(event.src_path)
-            print(f"extracting (on moved event) {path!s}")
-            extract(path)
+            self.console.log(
+                f"on_moved(file, src_path={src_path!s} dest_path={dest_path!s})"
+            )
+
+            file_extension = "".join(dest_path.suffixes)
+            if file_extension in self.archive_suffixes:
+                extract(dest_path)
+        else:
+            self.console.log(
+                f"on_moved(folder, src_path={src_path!s}) dest_path={dest_path!s})"
+            )
 
 
 @click.command("watch")
@@ -134,12 +179,14 @@ def watch(ctx: click.Context, path: Path) -> None:
         print(f"[red]'{path}' does not exist.")
         ctx.exit(1)
 
-    event_handler = ArchiveFilesEventHandler()
+    console = Console()
+
+    event_handler = ArchiveFilesEventHandler(console)
     observer = Observer()
     observer.schedule(event_handler, str(path), recursive=True)
     observer.start()
     try:
-        print("watcher started")
+        console.log("watcher started")
         while observer.is_alive():
             observer.join(1)
     finally:

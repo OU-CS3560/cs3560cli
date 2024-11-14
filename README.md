@@ -13,9 +13,10 @@ python -m pip install cs3560cli
 - `categorize` : Group students submitted files and put them in a folder. One folder for each student.
 - `create gh-invite` : Invite students to a team in GitHub organization using data from Canvas.
 - `create gitignore` : Create an opinionated `.gitignore` file where `macOS.gitignore` and `Windows.gitignore` are included by default.
-- `watch` : Watch for (and extract) the zip file.
+- `watch` : Watch for (and extract) an archive file (e.g. `.tar.gz`, `.zip`, `.tar`, etc.) with 7zip.
 - `highlight` : Create HTML fragments of a syntax highlighted snippet of code that can then be embedded in LMS. For an image of the source code, you may want to use [Charm's freeze](https://github.com/charmbracelet/freeze) instead.
 - `check github-username` : Check if the GitHub or Codewars username the student provided actually exist or not.
+- `create password` : Create a short password for a quiz.
 
 ## Examples
 
@@ -77,20 +78,15 @@ gh extension install mislav/gh-repo-collab
 ```
 
 ```ps1
+$ParentTeamId = python -m cs3560cli get team-id OU-CS3560/entire-class-24f | Out-String
+
 $TeamId = ""
 $TeamHandle = "OU-CS3560/" + $TeamId
 $RepoHandle = "OU-CS3560/" + $TeamId
-
-$ParentTeamId = python -m cs3560cli github get-team-id OU-CS3560 entire-class-24f | Out-String
-gh api \
-  --method POST \
-  -H "Accept: application/vnd.github+json" \
-  -H "X-GitHub-Api-Version: 2022-11-28" \
-  /orgs/OU-CS3560/teams \
-  -f parent_team_id=$ParentTeamId \
-  -f name="$TeamId" \
-  -f notification_setting='notifications_disabled' \
-  -f privacy='closed'
-gh repo create --private --template OU-CS3560/team-template $RepoHandle
+[int]$ParentTeamId = "10831116"
+gh api --method POST -H "Accept: application/vnd.github+json" -H "X-GitHub-Api-Version: 2022-11-28" /orgs/OU-CS3560/teams -f "parent_team_id:=$ParentTeamId" -f name="$TeamId" -f notification_setting='notifications_disabled' -f privacy='closed'
+gh repo create --private --template OU-CS3560/team-repo-template $RepoHandle
 gh repo-collab add $RepoHandle $TeamHandle --permission maintain
 ```
+
+However, the API call to `/orgs/OU-CS3560/teams` fails because the `parent_team_id` is not an integer.

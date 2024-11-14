@@ -55,6 +55,6 @@ def get_team_id_command(
     except PermissionError:
         print(
             f"[red]Cannot retrieve the team's ID for '{team_path}'. "
-            "Please make sure that the token has at least 'admin:org' permission and it is authorized with SAML SSO."
+            "Please make sure that the token has at least [bold blue]repo[/] and [bold blue]org:admin[/] permission. If your organization is using SSO-SAML, your token must also be SSO-SAML authorized for that organization as well."
         )
         ctx.exit(1)

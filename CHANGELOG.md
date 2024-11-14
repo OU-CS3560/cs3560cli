@@ -10,6 +10,12 @@ Note that the log for version before v0.2.1 may not be in the mentioned format.
 
 ## [Unreleased]
 
+### Changed
+
+- Use `rich.Console` for logging actions in `cs3560cli watch` command.
+- In `cs3560cli watch` command, fix a bug where `event.src_path` is used instead of the `event.dest_path`.
+- In `cs3560cli watch` command, add a check to only extract the archive when the destination of the move is the archive file.
+
 ## v0.4.0 - 2024-11-14
 
 ### Added
