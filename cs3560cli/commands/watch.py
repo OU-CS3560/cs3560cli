@@ -121,6 +121,7 @@ class ArchiveFilesEventHandler(PatternMatchingEventHandler):
             src_path = to_path(event.src_path)
             self.console.log(f"on_created(file, src_path={src_path!s})")
         else:
+            src_path = to_path(event.src_path)
             self.console.log(f"on_created(folder, src_path={src_path!s})")
 
     def on_closed(self, event: FileClosedEvent) -> None:
